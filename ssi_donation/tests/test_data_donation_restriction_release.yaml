@@ -1105,6 +1105,16 @@ scenarios:
           net_asset_released_account_id: "REC: released_account.id"
           net_asset_reclassified_account_id: "REC: reclassified_account.id"
 
+      - step: "Record realized usage against the fund"
+        action: "create"
+        model: "test.donation_fund_consumer_one"
+        save_as: "consumer"
+        values:
+          name: "Doc Release Consumer R7"
+          state: "done"
+          realized_amount: 50000.0
+          donation_fund_id: "REC: fund.id"
+
       - step: "A release against the unrestricted fund must be rejected"
         action: "create"
         model: "donation_restriction_release"
