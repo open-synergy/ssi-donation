@@ -6,9 +6,12 @@
 Donation
 ========
 
-Manages donation master data, starting with the donation fund: a wadah of donated
-money bound to a single analytic account, together with whether the donor restricted
-how that money may be used (PSAK 45 / ISAK 35).
+Manages donations: the donation fund (a wadah of donated money bound to a single
+analytic account, together with whether the donor restricted how that money may be
+used per PSAK 45 / ISAK 35), the donation type (accounting configuration a receipt
+is posted under), and the donation document itself, which records the receipt of a
+donation from a donor and, once Done, posts its own balanced journal entry crediting
+the fund's analytic account.
 
 
 Work Instruction

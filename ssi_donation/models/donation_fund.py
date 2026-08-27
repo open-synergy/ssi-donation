@@ -11,14 +11,15 @@ class DonationFund(models.Model):
     Represents a donation fund: an envelope of donated money bound to a
     single analytic account, together with whether the donor restricted
     how that money may be used.
-    A fund never holds money by itself — the receipt document (built in
-    a later item) credits the bound analytic account when money comes
-    in, and the document that uses the money debits it. This model only
-    carries the dimension (``analytic_account_id``) and the donor
-    restriction terms (PSAK 45 / ISAK 35: "with donor restriction" vs
-    "without donor restriction"); the balance fields are intentionally
-    placeholder zero here since the receipt/usage documents this item
-    is scoped to precede do not exist yet.
+    A fund never holds money by itself — the ``donation`` receipt
+    document credits the bound analytic account when money comes in
+    (reflected here as ``amount_received``), and the document that uses
+    the money debits it. This model only carries the dimension
+    (``analytic_account_id``) and the donor restriction terms (PSAK 45 /
+    ISAK 35: "with donor restriction" vs "without donor restriction");
+    ``amount_committed``/``amount_realized`` remain placeholder zero
+    since the documents that commit/realize money from a fund are not
+    part of this item's scope and are wired up in a later item.
     """
 
     _name = "donation_fund"
@@ -75,16 +76,23 @@ class DonationFund(models.Model):
         help="Net asset account this fund's balance is carried on. "
         "Required when Restriction Type is 'With Donor Restriction'.",
     )
+    donation_ids = fields.One2many(
+        string="Donations",
+        comodel_name="donation",
+        inverse_name="fund_id",
+        help="Donation receipt documents pointing to this fund, of "
+        "any state. Not shown on any view -- it exists only so "
+        "``amount_received`` recomputes when a Donation's state, "
+        "Amount, or Fund changes.",
+    )
     amount_received = fields.Monetary(
         string="Amount Received",
         currency_field="company_currency_id",
         compute="_compute_amount_received",
         store=True,
         compute_sudo=True,
-        help="Total amount received into this fund. Always zero for "
-        "now: the donation receipt document this should be derived "
-        "from is not part of this item's scope and is wired up in a "
-        "later item.",
+        help="Total Amount of every ``donation`` document in state "
+        "Done that points to this fund.",
     )
     amount_committed = fields.Monetary(
         string="Amount Committed",
@@ -118,18 +126,21 @@ class DonationFund(models.Model):
         "Received minus Amount Committed).",
     )
 
-    @api.depends()
+    @api.depends(
+        "donation_ids.amount",
+        "donation_ids.state",
+    )
     def _compute_amount_received(self):
-        """Return zero until the donation receipt document exists.
-
-        No real dependency: the receipt document this should be
-        derived from is not part of this item's scope, so the value
-        is a fixed placeholder wired up in a later item.
+        """Sum the Amount of every Done donation pointing to this fund.
 
         :return: nothing; assigns ``amount_received``
         """
         for record in self:
-            record.amount_received = 0.0
+            result = 0.0
+            for donation in record.donation_ids:
+                if donation.state == "done":
+                    result += donation.amount
+            record.amount_received = result
 
     @api.depends()
     def _compute_amount_committed(self):

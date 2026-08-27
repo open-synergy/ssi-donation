@@ -1,0 +1,1100 @@
+# No shared `setup:` block on purpose. Every scenario in this file runs
+# inside the SAME database transaction (odoo-yaml-test replays `setup:`
+# in full for every scenario, without a savepoint), so a fixture shared
+# via `setup:` would recreate the same unique codes on every replay and
+# fail with "Duplicate code" from the second scenario onward. Instead,
+# each scenario builds its own self-contained fixture chain with a
+# scenario-unique code suffix -- the same pattern already used by
+# test_data_donation_type.yaml in this module.
+
+options:
+  auto_refresh: true
+
+scenarios:
+  - name: "Donation - Cash To Unrestricted Fund, Full Workflow"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Donation Analytic D1"
+
+      - step: "Create the fund the donation is received into"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund D1"
+          code: "TDND1"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create the income account"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Donation Income D1"
+          code: "TDNIN01"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Donation Receivable D1"
+          code: "TDNRC01"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the cash journal's default account"
+        action: "create"
+        model: "account.account"
+        save_as: "cash_account"
+        values:
+          name: "Test Donation Cash D1"
+          code: "TDNCA01"
+          user_type_id: "REF: account.data_account_type_liquidity"
+
+      - step: "Create the journal the donation is posted through"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Donation Journal D1"
+          code: "TDNJ01"
+          type: "general"
+          default_account_id: "REC: cash_account.id"
+
+      - step: "Create the donation type"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Donation Type D1"
+          code: "TDNTY01"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+
+      - step: "Create the donor"
+        action: "create"
+        model: "res.partner"
+        save_as: "donor"
+        values:
+          name: "Test Donor D1"
+
+      - step: "Create the donation"
+        action: "create"
+        model: "donation"
+        save_as: "donation"
+        values:
+          partner_id: "REC: donor.id"
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          amount: 1000000.0
+          receipt_method: "cash"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+
+      - step: "Assert the debit account follows Cash Received"
+        action: "assert"
+        target: "donation"
+        asserts:
+          state:
+            type: "value"
+            expected: "draft"
+          debit_account_id:
+            type: "m2o"
+            expected: "REC: cash_account"
+          move_id:
+            type: "value"
+            operator: "is_falsy"
+
+      - step: "Confirm the donation"
+        action: "call"
+        target: "donation"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+
+      - step: "Approve the donation, which also runs Done"
+        action: "call"
+        target: "donation"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+
+      - step: "Assert the accounting entry was created and balanced"
+        action: "assert"
+        target: "donation"
+        asserts:
+          move_id:
+            type: "value"
+            operator: "is_truthy"
+
+      - step: "Assert the move has exactly two balanced lines"
+        action: "search"
+        model: "account.move.line"
+        domain: [["move_id", "=", "REC: donation.move_id.id"]]
+        save_as: "move_lines_1"
+        expect_count: 2
+
+      - step: "Assert the fund's Amount Received reflects this donation"
+        action: "assert"
+        target: "fund"
+        asserts:
+          amount_received:
+            type: "value"
+            expected: 1000000.0
+
+  - name: "Donation - Pledge Uses The Type's Receivable Account"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Donation Analytic D2"
+
+      - step: "Create the fund the donation is received into"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund D2"
+          code: "TDND2"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create the income account"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Donation Income D2"
+          code: "TDNIN02"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Donation Receivable D2"
+          code: "TDNRC02"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the journal the donation is posted through"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Donation Journal D2"
+          code: "TDNJ02"
+          type: "general"
+
+      - step: "Create the donation type"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Donation Type D2"
+          code: "TDNTY02"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+
+      - step: "Create the donor"
+        action: "create"
+        model: "res.partner"
+        save_as: "donor"
+        values:
+          name: "Test Donor D2"
+
+      - step: "Create the pledge donation"
+        action: "create"
+        model: "donation"
+        save_as: "donation"
+        values:
+          partner_id: "REC: donor.id"
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          amount: 500000.0
+          receipt_method: "pledge"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+
+      - step: "Assert the debit account follows Pledge / Receivable"
+        action: "assert"
+        target: "donation"
+        asserts:
+          debit_account_id:
+            type: "m2o"
+            expected: "REC: receivable_account"
+
+  - name: "Donation - Restricted Fund Carries Analytic Account On Credit"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Donation Analytic D3"
+
+      - step: "Create the net asset account"
+        action: "create"
+        model: "account.account"
+        save_as: "net_asset_account"
+        values:
+          name: "Test Donation Net Asset D3"
+          code: "TDNNA03"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the restricted fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Restricted Fund D3"
+          code: "TDND3"
+          analytic_account_id: "REC: analytic_account.id"
+          restriction_type: "with_restriction"
+          restriction_note: "Scholarship disbursement only."
+          net_asset_account_id: "REC: net_asset_account.id"
+
+      - step: "Create the income account"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Donation Income D3"
+          code: "TDNIN03"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Donation Receivable D3"
+          code: "TDNRC03"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the journal the donation is posted through"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Donation Journal D3"
+          code: "TDNJ03"
+          type: "general"
+
+      - step: "Create the donation type"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Donation Type D3"
+          code: "TDNTY03"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+
+      - step: "Create the donor"
+        action: "create"
+        model: "res.partner"
+        save_as: "donor"
+        values:
+          name: "Test Donor D3"
+
+      - step: "Create the donation against the restricted fund"
+        action: "create"
+        model: "donation"
+        save_as: "donation"
+        values:
+          partner_id: "REC: donor.id"
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          amount: 250000.0
+          receipt_method: "pledge"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+
+      - step: "Assert the donation copies the fund's restriction terms"
+        action: "assert"
+        target: "donation"
+        asserts:
+          restriction_type:
+            type: "value"
+            expected: "with_restriction"
+          analytic_account_id:
+            type: "m2o"
+            expected: "REC: analytic_account"
+
+      - step: "Confirm the donation"
+        action: "call"
+        target: "donation"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+
+      - step: "Approve the donation, which also runs Done"
+        action: "call"
+        target: "donation"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+
+      - step: "Assert exactly one credit line carries the fund's analytic account"
+        action: "search"
+        model: "account.move.line"
+        domain:
+          [
+            ["move_id", "=", "REC: donation.move_id.id"],
+            ["credit", ">", 0],
+            ["analytic_account_id", "=", "REC: analytic_account.id"],
+          ]
+        save_as: "credit_lines"
+        expect_count: 1
+
+      - step: "Assert no debit line carries an analytic account"
+        action: "search"
+        model: "account.move.line"
+        domain:
+          [
+            ["move_id", "=", "REC: donation.move_id.id"],
+            ["debit", ">", 0],
+            ["analytic_account_id", "!=", false],
+          ]
+        save_as: "debit_lines_with_analytic"
+        expect_count: 0
+
+  - name: "Donation - Two Done Donations Sum Into Amount Received"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Donation Analytic D4"
+
+      - step: "Create the fund the donations are received into"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund D4"
+          code: "TDND4"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create the income account"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Donation Income D4"
+          code: "TDNIN04"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Donation Receivable D4"
+          code: "TDNRC04"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the journal the donations are posted through"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Donation Journal D4"
+          code: "TDNJ04"
+          type: "general"
+
+      - step: "Create the donation type"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Donation Type D4"
+          code: "TDNTY04"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+
+      - step: "Create the donor"
+        action: "create"
+        model: "res.partner"
+        save_as: "donor"
+        values:
+          name: "Test Donor D4"
+
+      - step: "Create and complete the first donation"
+        action: "create"
+        model: "donation"
+        save_as: "donation_1"
+        values:
+          partner_id: "REC: donor.id"
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          amount: 100000.0
+          receipt_method: "pledge"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+
+      - step: "Confirm the first donation"
+        action: "call"
+        target: "donation_1"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+
+      - step: "Approve the first donation, which also runs Done"
+        action: "call"
+        target: "donation_1"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+
+      - step: "Create and complete the second donation"
+        action: "create"
+        model: "donation"
+        save_as: "donation_2"
+        values:
+          partner_id: "REC: donor.id"
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          amount: 50000.0
+          receipt_method: "pledge"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+
+      - step: "Confirm the second donation"
+        action: "call"
+        target: "donation_2"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+
+      - step: "Approve the second donation, which also runs Done"
+        action: "call"
+        target: "donation_2"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+
+      - step: "Assert Amount Received equals the sum of both donations"
+        action: "assert"
+        target: "fund"
+        asserts:
+          amount_received:
+            type: "value"
+            expected: 150000.0
+
+  - name: "Donation - Cancelling A Done Donation Clears The Move And Balance"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Donation Analytic D5"
+
+      - step: "Create the fund the donation is received into"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund D5"
+          code: "TDND5"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create the income account"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Donation Income D5"
+          code: "TDNIN05"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Donation Receivable D5"
+          code: "TDNRC05"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the journal the donation is posted through"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Donation Journal D5"
+          code: "TDNJ05"
+          type: "general"
+
+      - step: "Create the donation type"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Donation Type D5"
+          code: "TDNTY05"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+
+      - step: "Create the donor"
+        action: "create"
+        model: "res.partner"
+        save_as: "donor"
+        values:
+          name: "Test Donor D5"
+
+      - step: "Create and complete the donation"
+        action: "create"
+        model: "donation"
+        save_as: "donation"
+        values:
+          partner_id: "REC: donor.id"
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          amount: 75000.0
+          receipt_method: "pledge"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+
+      - step: "Confirm the donation"
+        action: "call"
+        target: "donation"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+
+      - step: "Approve the donation, which also runs Done"
+        action: "call"
+        target: "donation"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+
+      - step: "Assert Amount Received reflects the donation before cancel"
+        action: "assert"
+        target: "fund"
+        asserts:
+          amount_received:
+            type: "value"
+            expected: 75000.0
+
+      - step: "Create the cancellation reason"
+        action: "create"
+        model: "base.cancel_reason"
+        save_as: "cancel_reason"
+        values:
+          name: "Test Donation Cancel Reason D5"
+          code: "TDNCR05"
+          global_use: true
+
+      - step: "Cancel the donation through the cancel reason wizard"
+        action: "wizard"
+        model: "base.select_cancel_reason"
+        target: "donation"
+        as_user: "base.user_admin"
+        values:
+          cancel_reason_id: "REC: cancel_reason"
+        method: "action_confirm"
+        refresh: true
+
+      - step: "Assert the move is cleared and the state is cancel"
+        action: "assert"
+        target: "donation"
+        asserts:
+          state:
+            type: "value"
+            expected: "cancel"
+          move_id:
+            type: "value"
+            operator: "is_falsy"
+
+      - step: "Assert Amount Received dropped back to zero"
+        action: "assert"
+        target: "fund"
+        asserts:
+          amount_received:
+            type: "value"
+            expected: 0.0
+
+  - name: "Donation - Picking Type Defaults Journal And Income Account"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Donation Analytic D6"
+
+      - step: "Create the fund the donation is received into"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund D6"
+          code: "TDND6"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create the income account"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Donation Income D6"
+          code: "TDNIN06"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Donation Receivable D6"
+          code: "TDNRC06"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the journal the type defaults to"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Donation Journal D6"
+          code: "TDNJ06"
+          type: "general"
+
+      - step: "Create the donation type"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Donation Type D6"
+          code: "TDNTY06"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+
+      - step: "Create the donor"
+        action: "create"
+        model: "res.partner"
+        save_as: "donor"
+        values:
+          name: "Test Donor D6"
+
+      - step: "Pick the Type on a new donation form and check the defaults"
+        action: "form"
+        model: "donation"
+        save: false
+        ops:
+          - set:
+              type_id: "REC: type"
+          - assert:
+              journal_id:
+                type: "m2o"
+                expected: "REC: journal"
+              income_account_id:
+                type: "m2o"
+                expected: "REC: income_account"
+
+  - name: "Donation - Amount Must Be Positive"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Donation Analytic D7"
+
+      - step: "Create the fund the donation is received into"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund D7"
+          code: "TDND7"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create the income account"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Donation Income D7"
+          code: "TDNIN07"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Donation Receivable D7"
+          code: "TDNRC07"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the journal the donation is posted through"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Donation Journal D7"
+          code: "TDNJ07"
+          type: "general"
+
+      - step: "Create the donation type"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Donation Type D7"
+          code: "TDNTY07"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+
+      - step: "Create the donor"
+        action: "create"
+        model: "res.partner"
+        save_as: "donor"
+        values:
+          name: "Test Donor D7"
+
+      - step: "A donation with a zero Amount must be rejected"
+        action: "create"
+        model: "donation"
+        expect_error:
+          type: "ValidationError"
+          message_contains: "zero or negative"
+        values:
+          partner_id: "REC: donor.id"
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          amount: 0.0
+          receipt_method: "pledge"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+
+  - name: "Donation - Fund Must Be Among The Type's Allowed Funds"
+    steps:
+      - step: "Create the analytic account for the allowed fund"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "allowed_analytic"
+        values:
+          name: "Test Donation Analytic D8a"
+
+      - step: "Create the allowed fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "allowed_fund"
+        values:
+          name: "Test Allowed Fund D8"
+          code: "TDND8A"
+          analytic_account_id: "REC: allowed_analytic.id"
+
+      - step: "Create the analytic account for the disallowed fund"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "other_analytic"
+        values:
+          name: "Test Donation Analytic D8b"
+
+      - step: "Create the fund that is NOT in the type's allowed list"
+        action: "create"
+        model: "donation_fund"
+        save_as: "other_fund"
+        values:
+          name: "Test Disallowed Fund D8"
+          code: "TDND8B"
+          analytic_account_id: "REC: other_analytic.id"
+
+      - step: "Create the income account"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Donation Income D8"
+          code: "TDNIN08"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Donation Receivable D8"
+          code: "TDNRC08"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the journal the donation is posted through"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Donation Journal D8"
+          code: "TDNJ08"
+          type: "general"
+
+      - step: "Create the donation type, restricted to the allowed fund"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Donation Type D8"
+          code: "TDNTY08"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+          allowed_fund_ids: [[6, 0, ["REC: allowed_fund.id"]]]
+
+      - step: "Create the donor"
+        action: "create"
+        model: "res.partner"
+        save_as: "donor"
+        values:
+          name: "Test Donor D8"
+
+      - step: "A donation against the disallowed fund must be rejected"
+        action: "create"
+        model: "donation"
+        expect_error:
+          type: "ValidationError"
+          message_contains: "Allowed Funds"
+        values:
+          partner_id: "REC: donor.id"
+          type_id: "REC: type.id"
+          fund_id: "REC: other_fund.id"
+          amount: 10000.0
+          receipt_method: "pledge"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+
+  - name: "Donation - Date Must Fall Within The Fund's Restriction Window"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Donation Analytic D9"
+
+      - step: "Create the fund with a date-bound restriction window"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Dated Fund D9"
+          code: "TDND9"
+          analytic_account_id: "REC: analytic_account.id"
+          date_start: 2026-01-01
+          date_end: 2026-12-31
+
+      - step: "Create the income account"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Donation Income D9"
+          code: "TDNIN09"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Donation Receivable D9"
+          code: "TDNRC09"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the journal the donation is posted through"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Donation Journal D9"
+          code: "TDNJ09"
+          type: "general"
+
+      - step: "Create the donation type"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Donation Type D9"
+          code: "TDNTY09"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+
+      - step: "Create the donor"
+        action: "create"
+        model: "res.partner"
+        save_as: "donor"
+        values:
+          name: "Test Donor D9"
+
+      - step: "A donation dated before the Fund's window must be rejected"
+        action: "create"
+        model: "donation"
+        expect_error:
+          type: "ValidationError"
+          message_contains: "earlier than"
+        values:
+          partner_id: "REC: donor.id"
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          date: 2025-06-01
+          amount: 10000.0
+          receipt_method: "pledge"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+
+  - name: "Donation - User Without The Donation Group Cannot Create"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Donation Analytic D10"
+
+      - step: "Create the fund the donation would be received into"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund D10"
+          code: "TDND10"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create the income account"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Donation Income D10"
+          code: "TDNIN10"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Donation Receivable D10"
+          code: "TDNRC10"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the journal the donation would be posted through"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Donation Journal D10"
+          code: "TDNJ10"
+          type: "general"
+
+      - step: "Create the donation type"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Donation Type D10"
+          code: "TDNTY10"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+
+      - step: "Create the donor"
+        action: "create"
+        model: "res.partner"
+        save_as: "donor"
+        values:
+          name: "Test Donor D10"
+
+      - step: "Create an internal user without the Donation group"
+        action: "create"
+        model: "res.users"
+        save_as: "plain_user"
+        values:
+          name: "Plain Internal User D10"
+          login: "plain_user_d10@example.com"
+          groups_id: [[6, 0, ["REF: base.group_user"]]]
+
+      - step: "That user must be rejected creating a donation"
+        action: "create"
+        model: "donation"
+        as_user: "plain_user"
+        expect_error:
+          type: "AccessError"
+        values:
+          partner_id: "REC: donor.id"
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          amount: 10000.0
+          receipt_method: "pledge"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"

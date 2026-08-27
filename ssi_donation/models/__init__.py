@@ -4,3 +4,4 @@
 
 from . import donation_fund  # noqa: F401
 from . import donation_type  # noqa: F401
+from . import donation  # noqa: F401
