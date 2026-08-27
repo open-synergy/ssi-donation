@@ -17,7 +17,11 @@ Donation and restricted contribution management for non-profit organizations
 
 [//]: # (addons)
 
-This part will be replaced when running the oca-gen-addons-table script from OCA/maintainer-tools.
+Available addons
+----------------
+addon | version | maintainers | summary
+--- | --- | --- | ---
+[ssi_donation](ssi_donation/) | 14.0.1.0.0 |  | Donation
 
 [//]: # (end addons)
 
