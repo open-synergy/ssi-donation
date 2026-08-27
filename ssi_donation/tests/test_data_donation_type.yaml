@@ -1,0 +1,409 @@
+scenarios:
+  - name: "Donation Type - Create Minimal"
+    steps:
+      - step: "Create the journal for the donation receipt"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Donation Type Journal 1"
+          code: "TDTJ001"
+          type: "general"
+
+      - step: "Create the income account"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Donation Type Income 1"
+          code: "TDTIN001"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Donation Type Receivable 1"
+          code: "TDTRC001"
+          user_type_id: "REF: account.data_account_type_receivable"
+
+      - step: "Create the minimal donation type"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Type Minimal"
+          code: "TDT001"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+
+      - step: "Assert the minimal type was created with release fields empty"
+        action: "assert"
+        target: "type"
+        asserts:
+          id:
+            type: "value"
+            operator: "is_truthy"
+          release_journal_id:
+            type: "value"
+            operator: "is_falsy"
+          net_asset_released_account_id:
+            type: "value"
+            operator: "is_falsy"
+          net_asset_reclassified_account_id:
+            type: "value"
+            operator: "is_falsy"
+
+  - name: "Donation Type - Create With Complete Restriction Release"
+    steps:
+      - step: "Create the journal for the donation receipt"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Donation Type Journal 2"
+          code: "TDTJ002"
+          type: "general"
+
+      - step: "Create the income account"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Donation Type Income 2"
+          code: "TDTIN002"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Donation Type Receivable 2"
+          code: "TDTRC002"
+          user_type_id: "REF: account.data_account_type_receivable"
+
+      - step: "Create the release journal"
+        action: "create"
+        model: "account.journal"
+        save_as: "release_journal"
+        values:
+          name: "Test Donation Type Release Journal 1"
+          code: "TDTRJ001"
+          type: "general"
+
+      - step: "Create the net assets released account"
+        action: "create"
+        model: "account.account"
+        save_as: "released_account"
+        values:
+          name: "Test Net Assets Released 1"
+          code: "TDTNAR001"
+          user_type_id: "REF: account.data_account_type_equity"
+
+      - step: "Create the net assets reclassified account"
+        action: "create"
+        model: "account.account"
+        save_as: "reclassified_account"
+        values:
+          name: "Test Net Assets Reclassified 1"
+          code: "TDTNAC001"
+          user_type_id: "REF: account.data_account_type_equity"
+
+      - step: "Create the type with a complete restriction release package"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Type Complete Release"
+          code: "TDT002"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+          release_journal_id: "REC: release_journal.id"
+          net_asset_released_account_id: "REC: released_account.id"
+          net_asset_reclassified_account_id: "REC: reclassified_account.id"
+
+      - step: "Assert the complete release package was saved"
+        action: "assert"
+        target: "type"
+        asserts:
+          id:
+            type: "value"
+            operator: "is_truthy"
+          release_journal_id:
+            type: "m2o"
+            expected: "REC: release_journal"
+          net_asset_released_account_id:
+            type: "m2o"
+            expected: "REC: released_account"
+          net_asset_reclassified_account_id:
+            type: "m2o"
+            expected: "REC: reclassified_account"
+
+  - name: "Donation Type - Allowed Funds"
+    steps:
+      - step: "Create the journal for the donation receipt"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Donation Type Journal 3"
+          code: "TDTJ003"
+          type: "general"
+
+      - step: "Create the income account"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Donation Type Income 3"
+          code: "TDTIN003"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Donation Type Receivable 3"
+          code: "TDTRC003"
+          user_type_id: "REF: account.data_account_type_receivable"
+
+      - step: "Create the analytic account for the first allowed fund"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account_1"
+        values:
+          name: "Test Donation Type Analytic 1"
+
+      - step: "Create the first allowed fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund_1"
+        values:
+          name: "Test Allowed Fund 1"
+          code: "TDTF001"
+          analytic_account_id: "REC: analytic_account_1.id"
+
+      - step: "Create the analytic account for the second allowed fund"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account_2"
+        values:
+          name: "Test Donation Type Analytic 2"
+
+      - step: "Create the second allowed fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund_2"
+        values:
+          name: "Test Allowed Fund 2"
+          code: "TDTF002"
+          analytic_account_id: "REC: analytic_account_2.id"
+
+      - step: "Create the type restricted to the two allowed funds"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Type Allowed Funds"
+          code: "TDT003"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+          allowed_fund_ids:
+            - - 4
+              - "REC: fund_1.id"
+            - - 4
+              - "REC: fund_2.id"
+
+      - step: "Assert both allowed funds were saved"
+        action: "assert"
+        target: "type"
+        asserts:
+          allowed_fund_ids:
+            type: "m2m"
+            check: "exact"
+            expected_records:
+              - "REC: fund_1"
+              - "REC: fund_2"
+
+  - name: "Donation Type - Partner Domain Selection"
+    steps:
+      - step: "Create the journal for the donation receipt"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Donation Type Journal 4"
+          code: "TDTJ004"
+          type: "general"
+
+      - step: "Create the income account"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Donation Type Income 4"
+          code: "TDTIN004"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Donation Type Receivable 4"
+          code: "TDTRC004"
+          user_type_id: "REF: account.data_account_type_receivable"
+
+      - step: "Create the type with a domain partner selection"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Type Partner Domain"
+          code: "TDT004"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+          partner_selection_method: "domain"
+          partner_domain: "[('customer_rank', '>', 0)]"
+
+      - step: "Assert the partner domain selection was saved"
+        action: "assert"
+        target: "type"
+        asserts:
+          partner_selection_method:
+            type: "value"
+            expected: "domain"
+          partner_domain:
+            type: "value"
+            expected: "[('customer_rank', '>', 0)]"
+
+  - name: "Donation Type - Release Journal Must Not Be Cash Or Bank"
+    steps:
+      - step: "Create the income account"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Donation Type Income 5"
+          code: "TDTIN005"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Donation Type Receivable 5"
+          code: "TDTRC005"
+          user_type_id: "REF: account.data_account_type_receivable"
+
+      - step: "Create the journal for the donation receipt"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Donation Type Journal 5"
+          code: "TDTJ005"
+          type: "general"
+
+      - step: "Create a bank journal to use as an invalid release journal"
+        action: "create"
+        model: "account.journal"
+        save_as: "bank_journal"
+        values:
+          name: "Test Donation Type Bank Journal"
+          code: "TDTBJ001"
+          type: "bank"
+
+      - step: "Create the net assets released account"
+        action: "create"
+        model: "account.account"
+        save_as: "released_account"
+        values:
+          name: "Test Net Assets Released 2"
+          code: "TDTNAR002"
+          user_type_id: "REF: account.data_account_type_equity"
+
+      - step: "Create the net assets reclassified account"
+        action: "create"
+        model: "account.account"
+        save_as: "reclassified_account"
+        values:
+          name: "Test Net Assets Reclassified 2"
+          code: "TDTNAC002"
+          user_type_id: "REF: account.data_account_type_equity"
+
+      - step: "A type with a bank Release Journal must be rejected"
+        action: "create"
+        model: "donation_type"
+        expect_error:
+          type: "ValidationError"
+          message_contains: "Cash or Bank"
+        values:
+          name: "Test Type Bad Release Journal"
+          code: "TDT005"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+          release_journal_id: "REC: bank_journal.id"
+          net_asset_released_account_id: "REC: released_account.id"
+          net_asset_reclassified_account_id: "REC: reclassified_account.id"
+
+  - name: "Donation Type - Release Fields Must Be Filled Together"
+    steps:
+      - step: "Create the journal for the donation receipt"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Donation Type Journal 6"
+          code: "TDTJ006"
+          type: "general"
+
+      - step: "Create the income account"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Donation Type Income 6"
+          code: "TDTIN006"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Donation Type Receivable 6"
+          code: "TDTRC006"
+          user_type_id: "REF: account.data_account_type_receivable"
+
+      - step: "Create the net assets released account"
+        action: "create"
+        model: "account.account"
+        save_as: "released_account"
+        values:
+          name: "Test Net Assets Released 3"
+          code: "TDTNAR003"
+          user_type_id: "REF: account.data_account_type_equity"
+
+      - step: "A type with only Net Assets Released filled must be rejected"
+        action: "create"
+        model: "donation_type"
+        expect_error:
+          type: "ValidationError"
+          message_contains: "must be filled together"
+        values:
+          name: "Test Type Incomplete Release"
+          code: "TDT006"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+          net_asset_released_account_id: "REC: released_account.id"
