@@ -1,0 +1,173 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* test_ssi_donation
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: test_ssi_donation
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_bare__name
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__name
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__name
+msgid "# Document"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model.fields,help:test_ssi_donation.field_test_donation_fund_consumer_bare__donation_analytic_account_id
+#: model:ir.model.fields,help:test_ssi_donation.field_test_donation_fund_consumer_one__donation_analytic_account_id
+#: model:ir.model.fields,help:test_ssi_donation.field_test_donation_fund_consumer_two__donation_analytic_account_id
+msgid ""
+"Analytic account of Donation Fund, exposed here so this record can be "
+"filtered/reported on the same dimension its Donation Fund is bound to."
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model.fields.selection,name:test_ssi_donation.selection__test_donation_fund_consumer_one__state__cancel
+#: model:ir.model.fields.selection,name:test_ssi_donation.selection__test_donation_fund_consumer_two__state__cancel
+msgid "Cancelled"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__commit_value
+msgid "Commit Value"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__committed_amount
+msgid "Committed Amount"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_bare__create_uid
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__create_uid
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_bare__create_date
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__create_date
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__currency_id
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__currency_id
+msgid "Currency"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_bare__display_name
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__display_name
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_bare__donation_analytic_account_id
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__donation_analytic_account_id
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__donation_analytic_account_id
+msgid "Donation Analytic Account"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_bare__donation_fund_id
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__donation_fund_id
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__donation_fund_id
+msgid "Donation Fund"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model.fields,help:test_ssi_donation.field_test_donation_fund_consumer_bare__donation_fund_id
+#: model:ir.model.fields,help:test_ssi_donation.field_test_donation_fund_consumer_one__donation_fund_id
+#: model:ir.model.fields,help:test_ssi_donation.field_test_donation_fund_consumer_two__donation_fund_id
+msgid ""
+"Donation fund this record draws committed/realized money from. Leave empty "
+"when this record does not use any Donation Fund."
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model.fields.selection,name:test_ssi_donation.selection__test_donation_fund_consumer_one__state__done
+#: model:ir.model.fields.selection,name:test_ssi_donation.selection__test_donation_fund_consumer_two__state__done
+msgid "Done"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model.fields.selection,name:test_ssi_donation.selection__test_donation_fund_consumer_one__state__draft
+#: model:ir.model.fields.selection,name:test_ssi_donation.selection__test_donation_fund_consumer_two__state__draft
+msgid "Draft"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_bare__id
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__id
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__id
+msgid "ID"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_bare____last_update
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one____last_update
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_bare__write_uid
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__write_uid
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_bare__write_date
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__write_date
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model.fields.selection,name:test_ssi_donation.selection__test_donation_fund_consumer_one__state__open
+#: model:ir.model.fields.selection,name:test_ssi_donation.selection__test_donation_fund_consumer_two__state__open
+msgid "Open"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__realize_value
+msgid "Realize Value"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__realized_amount
+msgid "Realized Amount"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__state
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__state
+msgid "State"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model,name:test_ssi_donation.model_test_donation_fund_consumer_bare
+msgid "Test Donation Fund Consumer - Bare"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model,name:test_ssi_donation.model_test_donation_fund_consumer_one
+msgid "Test Donation Fund Consumer - One"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model,name:test_ssi_donation.model_test_donation_fund_consumer_two
+msgid "Test Donation Fund Consumer - Two"
+msgstr ""
