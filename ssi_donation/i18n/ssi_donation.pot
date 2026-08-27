@@ -1,0 +1,453 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* ssi_donation
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_needaction
+msgid "Action Needed"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__active
+msgid "Active"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_ids
+msgid "Activities"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_state
+msgid "Activity State"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_type_icon
+msgid "Activity Type Icon"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__amount_available
+msgid "Amount Available"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__amount_committed
+msgid "Amount Committed"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__amount_realized
+msgid "Amount Realized"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__amount_received
+msgid "Amount Received"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__analytic_account_id
+msgid "Analytic Account"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__analytic_account_id
+msgid ""
+"Analytic account this fund is bound to. This is the sole boundary between "
+"the donation module and every module that uses donated money: the donation "
+"receipt document credits this analytic account when funds come in, and the "
+"consuming document debits it when funds are used. Each analytic account may "
+"only be bound to one donation fund."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_attachment_count
+msgid "Attachment Count"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__code
+msgid "Code"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__company_id
+msgid "Company"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__company_currency_id
+msgid "Company Currency"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.ui.menu,name:ssi_donation.menu_donation_configuration
+msgid "Configuration"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.module.category,name:ssi_donation.donation_module_category
+#: model:ir.ui.menu,name:ssi_donation.menu_donation_root
+msgid "Donation"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.module.category,name:ssi_donation.donation_configurator_module_category
+msgid "Donation - Configurator"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model,name:ssi_donation.model_donation_fund
+#: model:res.groups,name:ssi_donation.donation_fund_group
+msgid "Donation Fund"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.actions.act_window,name:ssi_donation.donation_fund_action
+#: model:ir.ui.menu,name:ssi_donation.donation_fund_menu
+msgid "Donation Funds"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__date_end
+msgid ""
+"End of the time window the donor's restriction applies to. Must not be "
+"earlier than Restriction Start Date. Leave empty when the restriction is not"
+" time-bound."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_follower_ids
+msgid "Followers"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_channel_ids
+msgid "Followers (Channels)"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_partner_ids
+msgid "Followers (Partners)"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr ""
+
+#. module: ssi_donation
+#: model_terms:ir.ui.view,arch_db:ssi_donation.donation_fund_view_search
+msgid "Group By"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__id
+msgid "ID"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_exception_icon
+msgid "Icon"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__message_needaction
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__message_unread
+msgid "If checked, new messages require your attention."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__message_has_error
+msgid "If checked, some messages have a delivery error."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_is_follower
+msgid "Is Follower"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_main_attachment_id
+msgid "Main Attachment"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__active
+msgid ""
+"Master data status\n"
+"\n"
+"* Inactive data can not be selected when creating new transaction\n"
+"* Transaction with inactive master data can still be viewed\n"
+"* Set master data as inactive if master data no longger needed,\n"
+"but master data already used on transaction"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__code
+msgid ""
+"Master data unique identifier.\n"
+"\n"
+"* Fill with '/' if You do not need unique identifier\n"
+"* Click 'Generate Code' button to automatically assign code.\n"
+"  Sequence template mush be set to perform this action\n"
+"  Only master data with '/' code will be assign automatic code"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_has_error
+msgid "Message Delivery error"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_ids
+msgid "Messages"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__name
+msgid "Name"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__net_asset_account_id
+msgid "Net Asset Account"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__net_asset_account_id
+msgid ""
+"Net asset account this fund's balance is carried on. Required when "
+"Restriction Type is 'With Donor Restriction'."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_summary
+msgid "Next Activity Summary"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_type_id
+msgid "Next Activity Type"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__note
+msgid "Note"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_needaction_counter
+msgid "Number of Actions"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_has_error_counter
+msgid "Number of errors"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__message_needaction_counter
+msgid "Number of messages which requires an action"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__message_unread_counter
+msgid "Number of unread messages"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__amount_available
+msgid ""
+"Remaining amount this fund may still commit (Amount Received minus Amount "
+"Committed)."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.ui.menu,name:ssi_donation.menu_donation_report
+msgid "Reporting"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_user_id
+msgid "Responsible User"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__date_end
+msgid "Restriction End Date"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__restriction_note
+msgid "Restriction Note"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__date_start
+msgid "Restriction Start Date"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__restriction_type
+#: model_terms:ir.ui.view,arch_db:ssi_donation.donation_fund_view_search
+msgid "Restriction Type"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__date_start
+msgid ""
+"Start of the time window the donor's restriction applies to. Leave empty "
+"when the restriction is not time-bound."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__restriction_note
+msgid ""
+"The donor's restriction terms, in the donor's own words. Required when "
+"Restriction Type is 'With Donor Restriction'."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__amount_realized
+msgid ""
+"Total amount already realized (actually spent) against this fund. Always "
+"zero for now: the document that realizes a commitment is not part of this "
+"item's scope and is wired up in a later item."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__amount_committed
+msgid ""
+"Total amount committed against this fund. Always zero for now: the document "
+"that commits money from a fund is not part of this item's scope and is wired"
+" up in a later item."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__amount_received
+msgid ""
+"Total amount received into this fund. Always zero for now: the donation "
+"receipt document this should be derived from is not part of this item's "
+"scope and is wired up in a later item."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_unread
+msgid "Unread Messages"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_unread_counter
+msgid "Unread Messages Counter"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__website_message_ids
+msgid "Website Messages"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__website_message_ids
+msgid "Website communication history"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__restriction_type
+msgid ""
+"Whether the donor attached conditions to how this fund may be used (PSAK 45 "
+"/ ISAK 35). 'With Donor Restriction' requires a Restriction Note and a Net "
+"Asset Account."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields.selection,name:ssi_donation.selection__donation_fund__restriction_type__with_restriction
+msgid "With Donor Restriction"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields.selection,name:ssi_donation.selection__donation_fund__restriction_type__without_restriction
+msgid "Without Donor Restriction"
+msgstr ""
