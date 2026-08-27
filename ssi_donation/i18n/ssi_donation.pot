@@ -15,6 +15,7 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__name
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__name
 msgid "# Document"
 msgstr ""
 
@@ -37,6 +38,11 @@ msgid "Accounting date of this donation receipt."
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__date
+msgid "Accounting date of this restriction release."
+msgstr ""
+
+#. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__journal_id
 msgid ""
 "Accounting journal this donation's journal entry is posted through. "
@@ -45,8 +51,17 @@ msgid ""
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__journal_id
+msgid ""
+"Accounting journal this release's journal entry is posted through. Defaulted"
+" from the selected Type's Release Journal when Type is picked; may be "
+"overridden manually while still in Draft."
+msgstr ""
+
+#. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__message_needaction
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_needaction
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__message_needaction
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_needaction
 msgid "Action Needed"
 msgstr ""
@@ -59,22 +74,26 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__active_approval_ids
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__active_approval_ids
 msgid "Active Approvals"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__active_approver_partner_ids
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__active_approver_partner_ids
 msgid "Active Partners"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__active_approver_user_ids
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__active_approver_user_ids
 msgid "Active Users"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__activity_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_ids
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__activity_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__activity_ids
 msgid "Activities"
 msgstr ""
@@ -82,6 +101,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__activity_exception_decoration
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_exception_decoration
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__activity_exception_decoration
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr ""
@@ -89,6 +109,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__activity_state
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_state
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__activity_state
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__activity_state
 msgid "Activity State"
 msgstr ""
@@ -96,12 +117,14 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__activity_type_icon
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_type_icon
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__activity_type_icon
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__activity_type_icon
 msgid "Activity Type Icon"
 msgstr ""
 
 #. module: ssi_donation
 #: model:res.groups,name:ssi_donation.donation_all_group
+#: model:res.groups,name:ssi_donation.donation_restriction_release_all_group
 msgid "All"
 msgstr ""
 
@@ -112,11 +135,13 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__allowed_policy_template_ids
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__allowed_policy_template_ids
 msgid "Allowed Policy Templates"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__amount
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__amount
 msgid "Amount"
 msgstr ""
 
@@ -143,6 +168,11 @@ msgid "Amount Received"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__amount_released
+msgid "Amount Released"
+msgstr ""
+
+#. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund_usage__amount_realized
 msgid "Amount already realized (actually spent) by the consumer record."
 msgstr ""
@@ -160,8 +190,16 @@ msgid "Amount donated. Must be greater than zero."
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__amount
+msgid ""
+"Amount of net assets to release from restriction. Must be greater than zero "
+"and must not exceed the Fund's Releasable Amount."
+msgstr ""
+
+#. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__analytic_account_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__analytic_account_id
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__analytic_account_id
 msgid "Analytic Account"
 msgstr ""
 
@@ -170,6 +208,15 @@ msgstr ""
 msgid ""
 "Analytic account of Donation Fund, exposed here so this record can be "
 "filtered/reported on the same dimension its Donation Fund is bound to."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__analytic_account_id
+msgid ""
+"Analytic account of the selected Fund. Attached to BOTH this release's debit"
+" and credit journal items -- a restriction release never adds or removes "
+"money from the fund, only its net asset classification changes, so the "
+"analytic dimension must cancel out."
 msgstr ""
 
 #. module: ssi_donation
@@ -192,21 +239,25 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__approval_template_id
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__approval_template_id
 msgid "Approval Configuration"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__approval_template_id
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__approval_template_id
 msgid "Approval Template"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__approval_ids
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__approval_ids
 msgid "Approvals"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__approve_ok
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__approve_ok
 msgid ""
 "Approve policy\n"
 "\n"
@@ -215,63 +266,75 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__approved
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__approved
 msgid "Approved"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__message_attachment_count
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_attachment_count
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__message_attachment_count
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_attachment_count
 msgid "Attachment Count"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__approve_ok
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__approve_ok
 msgid "Can Approve"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__cancel_ok
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__cancel_ok
 msgid "Can Cancel"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__confirm_ok
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__confirm_ok
 msgid "Can Confirm"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__done_ok
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__done_ok
 msgid "Can Finished"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__manual_number_ok
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__manual_number_ok
 msgid "Can Input Manual Document Number"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__reject_ok
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__reject_ok
 msgid "Can Reject"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__restart_ok
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__restart_ok
 msgid "Can Restart"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__restart_approval_ok
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__restart_approval_ok
 msgid "Can Restart Approval"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__cancel_reason_id
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__cancel_reason_id
 msgid "Cancel Reason"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__cancel_ok
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__cancel_ok
 msgid ""
 "Cancel policy\n"
 "\n"
@@ -293,25 +356,30 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__company_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__company_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund_usage__company_id
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__company_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__company_id
 #: model:res.groups,name:ssi_donation.donation_company_group
+#: model:res.groups,name:ssi_donation.donation_restriction_release_company_group
 msgid "Company"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__company_currency_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__company_currency_id
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__company_currency_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__company_currency_id
 msgid "Company Currency"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__company_partner_id
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__company_partner_id
 msgid "Company Partner"
 msgstr ""
 
 #. module: ssi_donation
 #: model:res.groups,name:ssi_donation.donation_company_child_group
+#: model:res.groups,name:ssi_donation.donation_restriction_release_company_child_group
 msgid "Company and All Child Companies"
 msgstr ""
 
@@ -322,6 +390,7 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__company_id
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__company_id
 msgid ""
 "Company that own the document\n"
 "\n"
@@ -336,6 +405,7 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__confirm_ok
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__confirm_ok
 msgid ""
 "Confirm policy\n"
 "\n"
@@ -383,6 +453,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__create_uid
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__create_uid
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund_usage__create_uid
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__create_uid
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__create_uid
 msgid "Created by"
 msgstr ""
@@ -391,8 +462,14 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__create_date
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__create_date
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund_usage__create_date
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__create_date
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__create_date
 msgid "Created on"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__credit_account_id
+msgid "Credit Account"
 msgstr ""
 
 #. module: ssi_donation
@@ -403,6 +480,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__currency_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund_usage__currency_id
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__currency_id
 msgid "Currency"
 msgstr ""
 
@@ -413,6 +491,7 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__currency_id
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__currency_id
 msgid ""
 "Currency this document is expressed in. This document does not support a "
 "currency other than the Company Currency."
@@ -427,11 +506,13 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__date
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__date
 msgid "Date"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__debit_account_id
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__debit_account_id
 msgid "Debit Account"
 msgstr ""
 
@@ -444,6 +525,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__display_name
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__display_name
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund_usage__display_name
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__display_name
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__display_name
 #: model:ir.model.fields,field_description:ssi_donation.field_mixin_donation_fund_consumer__display_name
 msgid "Display Name"
@@ -490,6 +572,13 @@ msgstr ""
 #: model:ir.actions.act_window,name:ssi_donation.donation_fund_action
 #: model:ir.ui.menu,name:ssi_donation.donation_fund_menu
 msgid "Donation Funds"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model,name:ssi_donation.model_donation_restriction_release
+#: model:ir.module.category,name:ssi_donation.donation_restriction_release_data_ownership_module_category
+#: model:ir.module.category,name:ssi_donation.donation_restriction_release_workflow_module_category
+msgid "Donation Restriction Release"
 msgstr ""
 
 #. module: ssi_donation
@@ -551,6 +640,15 @@ msgid ""
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__type_id
+msgid ""
+"Donation type this release is recorded under. Supplies the default Release "
+"Journal, Net Assets Released From Restriction Account, and Net Assets "
+"Reclassified Without Donor Restriction Account. Must have all three "
+"configured."
+msgstr ""
+
+#. module: ssi_donation
 #: model:ir.actions.act_window,name:ssi_donation.donation_action
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__donation_ids
 #: model:ir.ui.menu,name:ssi_donation.donation_menu
@@ -559,6 +657,7 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__done_ok
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__done_ok
 msgid ""
 "Done policy\n"
 "\n"
@@ -585,6 +684,13 @@ msgid "Donor this donation is received from."
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__fund_id
+msgid ""
+"Donor-restricted donation fund this release reclassifies net assets for. "
+"Must have Restriction Type 'With Donor Restriction'."
+msgstr ""
+
+#. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__date_end
 msgid ""
 "End of the time window the donor's restriction applies to. Must not be "
@@ -595,6 +701,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__message_follower_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_follower_ids
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__message_follower_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_follower_ids
 msgid "Followers"
 msgstr ""
@@ -602,6 +709,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__message_channel_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_channel_ids
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__message_channel_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_channel_ids
 msgid "Followers (Channels)"
 msgstr ""
@@ -609,6 +717,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__message_partner_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_partner_ids
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__message_partner_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_partner_ids
 msgid "Followers (Partners)"
 msgstr ""
@@ -616,6 +725,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__activity_type_icon
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__activity_type_icon
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__activity_type_icon
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__activity_type_icon
 msgid "Font awesome icon e.g. fa-tasks"
 msgstr ""
@@ -628,13 +738,21 @@ msgid ""
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__note
+msgid "Free-form note about this restriction release."
+msgstr ""
+
+#. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__fund_id
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__fund_id
+#: model_terms:ir.ui.view,arch_db:ssi_donation.donation_restriction_release_view_search
 #: model_terms:ir.ui.view,arch_db:ssi_donation.donation_view_search
 msgid "Fund"
 msgstr ""
 
 #. module: ssi_donation
 #: model_terms:ir.ui.view,arch_db:ssi_donation.donation_fund_view_search
+#: model_terms:ir.ui.view,arch_db:ssi_donation.donation_restriction_release_view_search
 #: model_terms:ir.ui.view,arch_db:ssi_donation.donation_type_view_search
 #: model_terms:ir.ui.view,arch_db:ssi_donation.donation_view_search
 msgid "Group By"
@@ -653,6 +771,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund_usage__id
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__id
 #: model:ir.model.fields,field_description:ssi_donation.field_mixin_donation_fund_consumer__id
 msgid "ID"
@@ -661,6 +780,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__activity_exception_icon
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_exception_icon
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__activity_exception_icon
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__activity_exception_icon
 msgid "Icon"
 msgstr ""
@@ -668,6 +788,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__activity_exception_icon
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__activity_exception_icon
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__activity_exception_icon
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__activity_exception_icon
 msgid "Icon to indicate an exception activity."
 msgstr ""
@@ -677,6 +798,8 @@ msgstr ""
 #: model:ir.model.fields,help:ssi_donation.field_donation__message_unread
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__message_needaction
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__message_unread
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__message_needaction
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__message_unread
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__message_needaction
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__message_unread
 msgid "If checked, new messages require your attention."
@@ -685,6 +808,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__message_has_error
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__message_has_error
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__message_has_error
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__message_has_error
 msgid "If checked, some messages have a delivery error."
 msgstr ""
@@ -698,12 +822,14 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__message_is_follower
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_is_follower
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__message_is_follower
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_is_follower
 msgid "Is Follower"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__journal_id
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__journal_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__journal_id
 #: model_terms:ir.ui.view,arch_db:ssi_donation.donation_type_view_search
 msgid "Journal"
@@ -714,6 +840,13 @@ msgstr ""
 msgid ""
 "Journal entry generated when this donation reaches Done. Deleted again, and "
 "this field cleared, when the donation is cancelled."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__move_id
+msgid ""
+"Journal entry generated when this release reaches Done. Deleted again, and "
+"this field cleared, when the release is cancelled."
 msgstr ""
 
 #. module: ssi_donation
@@ -733,6 +866,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_donation.field_donation____last_update
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund____last_update
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund_usage____last_update
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release____last_update
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type____last_update
 #: model:ir.model.fields,field_description:ssi_donation.field_mixin_donation_fund_consumer____last_update
 msgid "Last Modified on"
@@ -742,6 +876,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__write_uid
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__write_uid
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund_usage__write_uid
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__write_uid
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__write_uid
 msgid "Last Updated by"
 msgstr ""
@@ -750,6 +885,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__write_date
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__write_date
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund_usage__write_date
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__write_date
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__write_date
 msgid "Last Updated on"
 msgstr ""
@@ -765,12 +901,14 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__message_main_attachment_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_main_attachment_id
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__message_main_attachment_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_main_attachment_id
 msgid "Main Attachment"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__manual_number_ok
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__manual_number_ok
 msgid ""
 "Manual number assignment policy\n"
 "\n"
@@ -804,6 +942,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__message_has_error
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_has_error
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__message_has_error
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_has_error
 msgid "Message Delivery error"
 msgstr ""
@@ -811,6 +950,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__message_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_ids
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__message_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_ids
 msgid "Messages"
 msgstr ""
@@ -822,12 +962,14 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__move_id
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__move_id
 msgid "Move"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__my_activity_date_deadline
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__my_activity_date_deadline
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__my_activity_date_deadline
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__my_activity_date_deadline
 msgid "My Activity Deadline"
 msgstr ""
@@ -840,6 +982,7 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__need_validation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__need_validation
 msgid "Need Validation"
 msgstr ""
 
@@ -854,8 +997,26 @@ msgid "Net Assets Reclassified Without Donor Restriction Account"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__credit_account_id
+msgid ""
+"Net Assets Reclassified Without Donor Restriction account, credited when "
+"this release reaches Done. Defaulted from the selected Type's Net Assets "
+"Reclassified Without Donor Restriction Account when Type is picked; may be "
+"overridden manually while still in Draft."
+msgstr ""
+
+#. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__net_asset_released_account_id
 msgid "Net Assets Released From Restriction Account"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__debit_account_id
+msgid ""
+"Net Assets Released From Restriction account, debited when this release "
+"reaches Done. Defaulted from the selected Type's Net Assets Released From "
+"Restriction Account when Type is picked; may be overridden manually while "
+"still in Draft."
 msgstr ""
 
 #. module: ssi_donation
@@ -868,6 +1029,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__activity_date_deadline
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_date_deadline
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__activity_date_deadline
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__activity_date_deadline
 msgid "Next Activity Deadline"
 msgstr ""
@@ -875,6 +1037,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__activity_summary
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_summary
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__activity_summary
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__activity_summary
 msgid "Next Activity Summary"
 msgstr ""
@@ -882,18 +1045,21 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__activity_type_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_type_id
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__activity_type_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__activity_type_id
 msgid "Next Activity Type"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__next_approval_ids
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__next_approval_ids
 msgid "Next Approvals"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__note
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__note
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__note
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__note
 msgid "Note"
 msgstr ""
@@ -901,6 +1067,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__message_needaction_counter
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_needaction_counter
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__message_needaction_counter
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_needaction_counter
 msgid "Number of Actions"
 msgstr ""
@@ -908,6 +1075,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__message_has_error_counter
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_has_error_counter
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__message_has_error_counter
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_has_error_counter
 msgid "Number of errors"
 msgstr ""
@@ -915,6 +1083,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__message_needaction_counter
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__message_needaction_counter
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__message_needaction_counter
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__message_needaction_counter
 msgid "Number of messages which requires an action"
 msgstr ""
@@ -922,6 +1091,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__message_has_error_counter
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__message_has_error_counter
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__message_has_error_counter
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__message_has_error_counter
 msgid "Number of messages with delivery error"
 msgstr ""
@@ -929,6 +1099,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__message_unread_counter
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__message_unread_counter
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__message_unread_counter
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__message_unread_counter
 msgid "Number of unread messages"
 msgstr ""
@@ -960,6 +1131,7 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__policy_template_id
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__policy_template_id
 msgid "Policy Template"
 msgstr ""
 
@@ -975,6 +1147,7 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__reject_ok
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__reject_ok
 msgid ""
 "Reject policy\n"
 "\n"
@@ -983,12 +1156,26 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__rejected
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__rejected
 msgid "Rejected"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__amount_releasable
+msgid "Releasable Amount"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__release_journal_id
 msgid "Release Journal"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__amount_releasable
+msgid ""
+"Remaining amount of the selected Fund's Amount Realized not yet released "
+"from restriction (Amount Realized minus Amount Released). Guidance only, not"
+" stored -- Amount must not exceed this value."
 msgstr ""
 
 #. module: ssi_donation
@@ -1005,18 +1192,21 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__user_id
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__user_id
 msgid "Responsible"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__activity_user_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_user_id
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__activity_user_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__activity_user_id
 msgid "Responsible User"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__restart_approval_ok
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__restart_approval_ok
 msgid ""
 "Restart approval policy\n"
 "\n"
@@ -1025,6 +1215,7 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__restart_ok
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__restart_ok
 msgid ""
 "Restart policy\n"
 "\n"
@@ -1047,6 +1238,13 @@ msgid "Restriction Release"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.actions.act_window,name:ssi_donation.donation_restriction_release_action
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__restriction_release_ids
+#: model:ir.ui.menu,name:ssi_donation.donation_restriction_release_menu
+msgid "Restriction Releases"
+msgstr ""
+
+#. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__date_start
 msgid "Restriction Start Date"
 msgstr ""
@@ -1060,6 +1258,7 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__reviewer_id
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__reviewer_id
 msgid "Reviewer"
 msgstr ""
 
@@ -1072,6 +1271,7 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__state
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__state
 msgid "State"
 msgstr ""
 
@@ -1087,6 +1287,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__activity_state
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__activity_state
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__activity_state
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__activity_state
 msgid ""
 "Status based on activities\n"
@@ -1100,6 +1301,15 @@ msgstr ""
 msgid ""
 "The donor's restriction terms, in the donor's own words. Required when "
 "Restriction Type is 'With Donor Restriction'."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__amount_released
+msgid ""
+"Total Amount of every ``donation_restriction_release`` document in state "
+"Done that points to this fund -- the portion of Amount Realized already "
+"reclassified out of restricted net assets. Does not affect Amount Available:"
+" a restriction release is a reclassification, not a spend."
 msgstr ""
 
 #. module: ssi_donation
@@ -1126,6 +1336,7 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__name
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__name
 msgid ""
 "Transaction/document number\n"
 "\n"
@@ -1139,6 +1350,8 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__type_id
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__type_id
+#: model_terms:ir.ui.view,arch_db:ssi_donation.donation_restriction_release_view_search
 #: model_terms:ir.ui.view,arch_db:ssi_donation.donation_view_search
 msgid "Type"
 msgstr ""
@@ -1146,6 +1359,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__activity_exception_decoration
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__activity_exception_decoration
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__activity_exception_decoration
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__activity_exception_decoration
 msgid "Type of the exception activity on record."
 msgstr ""
@@ -1153,6 +1367,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__message_unread
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_unread
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__message_unread
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_unread
 msgid "Unread Messages"
 msgstr ""
@@ -1160,6 +1375,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__message_unread_counter
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_unread_counter
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__message_unread_counter
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_unread_counter
 msgid "Unread Messages Counter"
 msgstr ""
@@ -1171,12 +1387,14 @@ msgid "Usage"
 msgstr ""
 
 #. module: ssi_donation
+#: model:res.groups,name:ssi_donation.donation_restriction_release_user_group
 #: model:res.groups,name:ssi_donation.donation_user_group
 msgid "User"
 msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__user_id
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__user_id
 msgid ""
 "User that responsible for document\n"
 "\n"
@@ -1187,6 +1405,7 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__reviewer_id
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__reviewer_id
 msgid ""
 "User that responsible to review document\n"
 "\n"
@@ -1195,15 +1414,18 @@ msgstr ""
 
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__active_approver_user_ids
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__active_approver_user_ids
 msgid "Users that can approve/reject document"
 msgstr ""
 
 #. module: ssi_donation
+#: model:res.groups,name:ssi_donation.donation_restriction_release_validator_group
 #: model:res.groups,name:ssi_donation.donation_validator_group
 msgid "Validator"
 msgstr ""
 
 #. module: ssi_donation
+#: model:res.groups,name:ssi_donation.donation_restriction_release_viewer_group
 #: model:res.groups,name:ssi_donation.donation_viewer_group
 msgid "Viewer"
 msgstr ""
@@ -1211,6 +1433,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation__website_message_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__website_message_ids
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_restriction_release__website_message_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__website_message_ids
 msgid "Website Messages"
 msgstr ""
@@ -1218,6 +1441,7 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation__website_message_ids
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__website_message_ids
+#: model:ir.model.fields,help:ssi_donation.field_donation_restriction_release__website_message_ids
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__website_message_ids
 msgid "Website communication history"
 msgstr ""
@@ -1238,4 +1462,12 @@ msgstr ""
 #. module: ssi_donation
 #: model:ir.model.fields.selection,name:ssi_donation.selection__donation_fund__restriction_type__without_restriction
 msgid "Without Donor Restriction"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__restriction_release_ids
+msgid ""
+"``donation_restriction_release`` documents pointing to this fund, of any "
+"state. Not shown on any view -- it exists only so ``amount_released`` "
+"recomputes when a Restriction Release's state, Amount, or Fund changes."
 msgstr ""
