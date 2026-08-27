@@ -21,6 +21,10 @@
                 type="text/javascript"
                 src="/ssi_donation/static/tests/tours/donation_tour.js"
             />
+        <script
+                type="text/javascript"
+                src="/ssi_donation/static/tests/tours/donation_restriction_release_tour.js"
+            />
     </xpath>
 </template>
 </odoo>

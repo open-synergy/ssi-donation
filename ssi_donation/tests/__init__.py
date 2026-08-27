@@ -10,3 +10,4 @@ from . import test_donation_restriction_release
 from . import test_ui_donation_fund
 from . import test_ui_donation_type
 from . import test_ui_donation
+from . import test_ui_donation_restriction_release

@@ -35,6 +35,14 @@ Donation Document
 * `Approve Donation <docs/donation/05-approve.html>`_
 * `Cancel Donation <docs/donation/10-cancel.html>`_
 
+Donation Restriction Release
+-----------------------------
+
+* `Create Donation Restriction Release <docs/donation_restriction_release/01-create.html>`_
+* `Confirm Donation Restriction Release <docs/donation_restriction_release/04-confirm.html>`_
+* `Approve Donation Restriction Release <docs/donation_restriction_release/05-approve.html>`_
+* `Cancel Donation Restriction Release <docs/donation_restriction_release/10-cancel.html>`_
+
 
 Installation
 ============
