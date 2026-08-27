@@ -14,6 +14,33 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__name
+msgid "# Document"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__debit_account_id
+msgid ""
+"Account debited when this donation reaches Done. The Journal's own default "
+"account when Receipt Method is 'Cash Received'; the Type's Receivable "
+"Account when Receipt Method is 'Pledge / Receivable'."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__date
+msgid "Accounting date of this donation receipt."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__journal_id
+msgid ""
+"Accounting journal this donation's journal entry is posted through. "
+"Defaulted from the selected Type when Type is picked; may be overridden "
+"manually while still in Draft."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__message_needaction
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_needaction
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_needaction
 msgid "Action Needed"
@@ -26,32 +53,66 @@ msgid "Active"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__active_approval_ids
+msgid "Active Approvals"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__active_approver_partner_ids
+msgid "Active Partners"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__active_approver_user_ids
+msgid "Active Users"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__activity_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__activity_ids
 msgid "Activities"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__activity_exception_decoration
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_exception_decoration
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__activity_state
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_state
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__activity_state
 msgid "Activity State"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__activity_type_icon
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_type_icon
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__activity_type_icon
 msgid "Activity Type Icon"
 msgstr ""
 
 #. module: ssi_donation
+#: model:res.groups,name:ssi_donation.donation_all_group
+msgid "All"
+msgstr ""
+
+#. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__allowed_fund_ids
 msgid "Allowed Funds"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__allowed_policy_template_ids
+msgid "Allowed Policy Templates"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__amount
+msgid "Amount"
 msgstr ""
 
 #. module: ssi_donation
@@ -75,8 +136,22 @@ msgid "Amount Received"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__amount
+msgid "Amount donated. Must be greater than zero."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__analytic_account_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__analytic_account_id
 msgid "Analytic Account"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__analytic_account_id
+msgid ""
+"Analytic account of the selected Fund. Attached to this donation's own "
+"credit journal item, never its debit item -- the analytic dimension belongs "
+"to the income/expense side, not to cash or receivables."
 msgstr ""
 
 #. module: ssi_donation
@@ -90,9 +165,96 @@ msgid ""
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__approval_template_id
+msgid "Approval Configuration"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__approval_template_id
+msgid "Approval Template"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__approval_ids
+msgid "Approvals"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__approve_ok
+msgid ""
+"Approve policy\n"
+"\n"
+"* If active user can see and execute 'Approve' button"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__approved
+msgid "Approved"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__message_attachment_count
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_attachment_count
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_attachment_count
 msgid "Attachment Count"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__approve_ok
+msgid "Can Approve"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__cancel_ok
+msgid "Can Cancel"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__confirm_ok
+msgid "Can Confirm"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__done_ok
+msgid "Can Finished"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__manual_number_ok
+msgid "Can Input Manual Document Number"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__reject_ok
+msgid "Can Reject"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__restart_ok
+msgid "Can Restart"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__restart_approval_ok
+msgid "Can Restart Approval"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__cancel_reason_id
+msgid "Cancel Reason"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__cancel_ok
+msgid ""
+"Cancel policy\n"
+"\n"
+"* If active user can see and execute 'Cancel' button"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields.selection,name:ssi_donation.selection__donation__receipt_method__cash
+msgid "Cash Received"
 msgstr ""
 
 #. module: ssi_donation
@@ -102,20 +264,50 @@ msgid "Code"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__company_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__company_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__company_id
+#: model:res.groups,name:ssi_donation.donation_company_group
 msgid "Company"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__company_currency_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__company_currency_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__company_currency_id
 msgid "Company Currency"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__company_partner_id
+msgid "Company Partner"
+msgstr ""
+
+#. module: ssi_donation
+#: model:res.groups,name:ssi_donation.donation_company_child_group
+msgid "Company and All Child Companies"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__company_id
+msgid ""
+"Company that own the document\n"
+"\n"
+"* Automatically filled with user's company.\n"
+"  Default company can be changed"
+msgstr ""
+
+#. module: ssi_donation
 #: model:ir.ui.menu,name:ssi_donation.menu_donation_configuration
 msgid "Configuration"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__confirm_ok
+msgid ""
+"Confirm policy\n"
+"\n"
+"* If active user can see and execute 'Confirm' button"
 msgstr ""
 
 #. module: ssi_donation
@@ -133,12 +325,22 @@ msgid ""
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__income_account_id
+msgid ""
+"Contribution revenue account credited when this donation reaches Done. "
+"Defaulted from the selected Type when Type is picked; may be overridden "
+"manually while still in Draft."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__create_uid
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__create_uid
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__create_uid
 msgid "Created by"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__create_date
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__create_date
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__create_date
 msgid "Created on"
@@ -150,18 +352,44 @@ msgid "Credit side account of the restriction release entry."
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__currency_id
+msgid "Currency"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__currency_id
+msgid ""
+"Currency this document is expressed in. This document does not support a "
+"currency other than the Company Currency."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__date
+msgid "Date"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__debit_account_id
+msgid "Debit Account"
+msgstr ""
+
+#. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__net_asset_released_account_id
 msgid "Debit side account of the restriction release entry."
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__display_name
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__display_name
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__display_name
 msgid "Display Name"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model,name:ssi_donation.model_donation
+#: model:ir.module.category,name:ssi_donation.donation_data_ownership_module_category
 #: model:ir.module.category,name:ssi_donation.donation_module_category
+#: model:ir.module.category,name:ssi_donation.donation_workflow_module_category
 #: model:ir.ui.menu,name:ssi_donation.menu_donation_root
 msgid "Donation"
 msgstr ""
@@ -196,14 +424,67 @@ msgid "Donation Types"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__fund_id
+msgid ""
+"Donation fund the money is received into. Must be one of the selected Type's"
+" Allowed Funds, unless that list is empty. Its Analytic Account is credited "
+"when this donation reaches Done."
+msgstr ""
+
+#. module: ssi_donation
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__allowed_fund_ids
 msgid ""
 "Donation funds this type may be used with. Leave empty to allow every fund."
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__donation_ids
+msgid ""
+"Donation receipt documents pointing to this fund, of any state. Not shown on"
+" any view -- it exists only so ``amount_received`` recomputes when a "
+"Donation's state, Amount, or Fund changes."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__type_id
+msgid ""
+"Donation type this receipt is recorded under. Supplies the default Journal, "
+"Income Account, Receivable Account, and the set of Funds this donation may "
+"be assigned to."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.actions.act_window,name:ssi_donation.donation_action
+#: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__donation_ids
+#: model:ir.ui.menu,name:ssi_donation.donation_menu
+msgid "Donations"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__done_ok
+msgid ""
+"Done policy\n"
+"\n"
+"* If active user can see and execute 'Done' button"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__partner_id
 #: model_terms:ir.ui.view,arch_db:ssi_donation.donation_type_view_form
 msgid "Donor"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__restriction_type
+msgid ""
+"Donor restriction terms of the selected Fund, copied here so reports can "
+"split unrestricted and donor-restricted donations without joining to "
+"``donation_fund``."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__partner_id
+msgid "Donor this donation is received from."
 msgstr ""
 
 #. module: ssi_donation
@@ -215,54 +496,86 @@ msgid ""
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__message_follower_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_follower_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_follower_ids
 msgid "Followers"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__message_channel_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_channel_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_channel_ids
 msgid "Followers (Channels)"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__message_partner_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_partner_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_partner_ids
 msgid "Followers (Partners)"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__activity_type_icon
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__activity_type_icon
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__activity_type_icon
 msgid "Font awesome icon e.g. fa-tasks"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__note
+msgid ""
+"Free-form note about this donation, e.g. how the donor wishes to be "
+"acknowledged."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__fund_id
+#: model_terms:ir.ui.view,arch_db:ssi_donation.donation_view_search
+msgid "Fund"
+msgstr ""
+
+#. module: ssi_donation
 #: model_terms:ir.ui.view,arch_db:ssi_donation.donation_fund_view_search
 #: model_terms:ir.ui.view,arch_db:ssi_donation.donation_type_view_search
+#: model_terms:ir.ui.view,arch_db:ssi_donation.donation_view_search
 msgid "Group By"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__receipt_method
+msgid ""
+"How this donation is received. 'Cash Received' debits the Journal's own "
+"default account -- the money is already in hand. 'Pledge / Receivable' "
+"debits the Type's Receivable Account instead -- the donor has committed to "
+"pay, but the cash has not arrived yet."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__id
 msgid "ID"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__activity_exception_icon
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_exception_icon
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__activity_exception_icon
 msgid "Icon"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__activity_exception_icon
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__activity_exception_icon
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__activity_exception_icon
 msgid "Icon to indicate an exception activity."
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__message_needaction
+#: model:ir.model.fields,help:ssi_donation.field_donation__message_unread
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__message_needaction
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__message_unread
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__message_needaction
@@ -271,26 +584,37 @@ msgid "If checked, new messages require your attention."
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__message_has_error
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__message_has_error
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__message_has_error
 msgid "If checked, some messages have a delivery error."
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__income_account_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__income_account_id
 msgid "Income Account"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__message_is_follower
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_is_follower
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_is_follower
 msgid "Is Follower"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__journal_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__journal_id
 #: model_terms:ir.ui.view,arch_db:ssi_donation.donation_type_view_search
 msgid "Journal"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__move_id
+msgid ""
+"Journal entry generated when this donation reaches Done. Deleted again, and "
+"this field cleared, when the donation is cancelled."
 msgstr ""
 
 #. module: ssi_donation
@@ -307,27 +631,39 @@ msgid ""
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation____last_update
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund____last_update
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type____last_update
 msgid "Last Modified on"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__write_uid
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__write_uid
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__write_uid
 msgid "Last Updated by"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__write_date
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__write_date
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__write_date
 msgid "Last Updated on"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__message_main_attachment_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_main_attachment_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_main_attachment_id
 msgid "Main Attachment"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__manual_number_ok
+msgid ""
+"Manual number assignment policy\n"
+"\n"
+"* If active user can edit document number"
 msgstr ""
 
 #. module: ssi_donation
@@ -355,18 +691,26 @@ msgid ""
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__message_has_error
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_has_error
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_has_error
 msgid "Message Delivery error"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__message_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_ids
 msgid "Messages"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__move_id
+msgid "Move"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__my_activity_date_deadline
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__my_activity_date_deadline
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__my_activity_date_deadline
 msgid "My Activity Deadline"
@@ -376,6 +720,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__name
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__name
 msgid "Name"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__need_validation
+msgid "Need Validation"
 msgstr ""
 
 #. module: ssi_donation
@@ -401,54 +750,68 @@ msgid ""
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__activity_date_deadline
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_date_deadline
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__activity_date_deadline
 msgid "Next Activity Deadline"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__activity_summary
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_summary
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__activity_summary
 msgid "Next Activity Summary"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__activity_type_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_type_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__activity_type_id
 msgid "Next Activity Type"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__next_approval_ids
+msgid "Next Approvals"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__note
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__note
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__note
 msgid "Note"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__message_needaction_counter
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_needaction_counter
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_needaction_counter
 msgid "Number of Actions"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__message_has_error_counter
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_has_error_counter
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_has_error_counter
 msgid "Number of errors"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__message_needaction_counter
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__message_needaction_counter
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__message_needaction_counter
 msgid "Number of messages which requires an action"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__message_has_error_counter
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__message_has_error_counter
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__message_has_error_counter
 msgid "Number of messages with delivery error"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__message_unread_counter
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__message_unread_counter
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__message_unread_counter
 msgid "Number of unread messages"
@@ -475,8 +838,36 @@ msgid "Partners"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields.selection,name:ssi_donation.selection__donation__receipt_method__pledge
+msgid "Pledge / Receivable"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__policy_template_id
+msgid "Policy Template"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__receipt_method
+msgid "Receipt Method"
+msgstr ""
+
+#. module: ssi_donation
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__receivable_account_id
 msgid "Receivable Account"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__reject_ok
+msgid ""
+"Reject policy\n"
+"\n"
+"* If active user can see and execute 'Reject' button"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__rejected
+msgid "Rejected"
 msgstr ""
 
 #. module: ssi_donation
@@ -497,9 +888,31 @@ msgid "Reporting"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__user_id
+msgid "Responsible"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__activity_user_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__activity_user_id
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__activity_user_id
 msgid "Responsible User"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__restart_approval_ok
+msgid ""
+"Restart approval policy\n"
+"\n"
+"* If active user can see and execute 'Restart Approval' button"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__restart_ok
+msgid ""
+"Restart policy\n"
+"\n"
+"* If active user can see and execute 'Restart' button"
 msgstr ""
 
 #. module: ssi_donation
@@ -523,9 +936,15 @@ msgid "Restriction Start Date"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__restriction_type
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__restriction_type
 #: model_terms:ir.ui.view,arch_db:ssi_donation.donation_fund_view_search
 msgid "Restriction Type"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__reviewer_id
+msgid "Reviewer"
 msgstr ""
 
 #. module: ssi_donation
@@ -536,6 +955,12 @@ msgid ""
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__state
+msgid "State"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__activity_state
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__activity_state
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__activity_state
 msgid ""
@@ -550,6 +975,13 @@ msgstr ""
 msgid ""
 "The donor's restriction terms, in the donor's own words. Required when "
 "Restriction Type is 'With Donor Restriction'."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation_fund__amount_received
+msgid ""
+"Total Amount of every ``donation`` document in state Done that points to "
+"this fund."
 msgstr ""
 
 #. module: ssi_donation
@@ -569,38 +1001,92 @@ msgid ""
 msgstr ""
 
 #. module: ssi_donation
-#: model:ir.model.fields,help:ssi_donation.field_donation_fund__amount_received
+#: model:ir.model.fields,help:ssi_donation.field_donation__name
 msgid ""
-"Total amount received into this fund. Always zero for now: the donation "
-"receipt document this should be derived from is not part of this item's "
-"scope and is wired up in a later item."
+"Transaction/document number\n"
+"\n"
+"* Unique indentifer of transaction\n"
+"* Leave '/' to automatically generate number\n"
+"* Change '/' into any number/identifier to manually assign number.\n"
+"  Manual number assignment can be done in 'Draft' state\n"
+"  Only user with 'Can Manualy Assign Number' policy can manually assign number.\n"
+"* Transaction with number other than '/' can not be deleted."
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__type_id
+#: model_terms:ir.ui.view,arch_db:ssi_donation.donation_view_search
+msgid "Type"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__activity_exception_decoration
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__activity_exception_decoration
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__activity_exception_decoration
 msgid "Type of the exception activity on record."
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__message_unread
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_unread
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_unread
 msgid "Unread Messages"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__message_unread_counter
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__message_unread_counter
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__message_unread_counter
 msgid "Unread Messages Counter"
 msgstr ""
 
 #. module: ssi_donation
+#: model:res.groups,name:ssi_donation.donation_user_group
+msgid "User"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__user_id
+msgid ""
+"User that responsible for document\n"
+"\n"
+"* Create user can be different with responsible user\n"
+"* Automatically filled with user that initiate document creation.\n"
+"  Default responsible can be changed."
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__reviewer_id
+msgid ""
+"User that responsible to review document\n"
+"\n"
+"* Unless it configured to approve reviewer does not equal to approver"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__active_approver_user_ids
+msgid "Users that can approve/reject document"
+msgstr ""
+
+#. module: ssi_donation
+#: model:res.groups,name:ssi_donation.donation_validator_group
+msgid "Validator"
+msgstr ""
+
+#. module: ssi_donation
+#: model:res.groups,name:ssi_donation.donation_viewer_group
+msgid "Viewer"
+msgstr ""
+
+#. module: ssi_donation
+#: model:ir.model.fields,field_description:ssi_donation.field_donation__website_message_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_fund__website_message_ids
 #: model:ir.model.fields,field_description:ssi_donation.field_donation_type__website_message_ids
 msgid "Website Messages"
 msgstr ""
 
 #. module: ssi_donation
+#: model:ir.model.fields,help:ssi_donation.field_donation__website_message_ids
 #: model:ir.model.fields,help:ssi_donation.field_donation_fund__website_message_ids
 #: model:ir.model.fields,help:ssi_donation.field_donation_type__website_message_ids
 msgid "Website communication history"
