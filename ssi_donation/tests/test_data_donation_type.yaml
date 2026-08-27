@@ -27,6 +27,7 @@ scenarios:
           name: "Test Donation Type Receivable 1"
           code: "TDTRC001"
           user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
 
       - step: "Create the minimal donation type"
         action: "create"
@@ -84,6 +85,7 @@ scenarios:
           name: "Test Donation Type Receivable 2"
           code: "TDTRC002"
           user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
 
       - step: "Create the release journal"
         action: "create"
@@ -171,6 +173,7 @@ scenarios:
           name: "Test Donation Type Receivable 3"
           code: "TDTRC003"
           user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
 
       - step: "Create the analytic account for the first allowed fund"
         action: "create"
@@ -259,6 +262,7 @@ scenarios:
           name: "Test Donation Type Receivable 4"
           code: "TDTRC004"
           user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
 
       - step: "Create the type with a domain partner selection"
         action: "create"
@@ -303,6 +307,7 @@ scenarios:
           name: "Test Donation Type Receivable 5"
           code: "TDTRC005"
           user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
 
       - step: "Create the journal for the donation receipt"
         action: "create"
@@ -384,6 +389,7 @@ scenarios:
           name: "Test Donation Type Receivable 6"
           code: "TDTRC006"
           user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
 
       - step: "Create the net assets released account"
         action: "create"

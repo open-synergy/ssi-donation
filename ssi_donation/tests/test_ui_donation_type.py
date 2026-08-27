@@ -40,6 +40,7 @@ class TestUiDonationType(HttpSavepointCase):
                 "name": "TOUR Donation Type Receivable Account",
                 "code": "TOURDTRC",
                 "user_type_id": cls.env.ref("account.data_account_type_receivable").id,
+                "reconcile": True,
             }
         )
 
