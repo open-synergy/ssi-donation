@@ -33,7 +33,11 @@ Donation Document
 * `Create Donation <docs/donation/01-create.html>`_
 * `Confirm Donation <docs/donation/04-confirm.html>`_
 * `Approve Donation <docs/donation/05-approve.html>`_
+* `Reject Donation <docs/donation/06-reject.html>`_
 * `Cancel Donation <docs/donation/10-cancel.html>`_
+* `Restart Donation <docs/donation/12-restart.html>`_
+* `Reset Document Number Donation <docs/donation/13-reset-number.html>`_
+* `Restart Approval Process Donation <docs/donation/14-restart-approval.html>`_
 
 Donation Restriction Release
 -----------------------------
