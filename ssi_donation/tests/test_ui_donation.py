@@ -148,6 +148,53 @@ class TestUiDonation(HttpSavepointCase):
             }
         )
 
+        # Pre-Condition for the reject tour (docs/donation/06-reject.md): a
+        # donation already in Waiting for Approval, found in the list by
+        # its donor's unique name. ``admin`` is a member of group
+        # Validator (see security/res_groups/donation.xml), so it is
+        # already registered as the active approver on the pending
+        # level, same as the approve tour above.
+        cls.tour_reject_donor = cls.env["res.partner"].create(
+            {
+                "name": "Tour Donation Reject Donor",
+            }
+        )
+        cls.tour_reject_donation = cls.env["donation"].create(
+            {
+                "partner_id": cls.tour_reject_donor.id,
+                "type_id": cls.tour_type.id,
+                "fund_id": cls.tour_fund.id,
+                "amount": 75000.0,
+                "receipt_method": "cash",
+                "journal_id": cls.tour_journal.id,
+                "income_account_id": cls.tour_income_account.id,
+            }
+        )
+        cls.tour_reject_donation.action_confirm()
+
+        # Pre-Condition for the restart tour (docs/donation/12-restart.md):
+        # a donation already Cancelled, found in the list by its donor's
+        # unique name. Cancelling here is done directly through the
+        # model method, not through the UI wizard, since it is only
+        # setup for the tour under test.
+        cls.tour_restart_donor = cls.env["res.partner"].create(
+            {
+                "name": "Tour Donation Restart Donor",
+            }
+        )
+        cls.tour_restart_donation = cls.env["donation"].create(
+            {
+                "partner_id": cls.tour_restart_donor.id,
+                "type_id": cls.tour_type.id,
+                "fund_id": cls.tour_fund.id,
+                "amount": 25000.0,
+                "receipt_method": "cash",
+                "journal_id": cls.tour_journal.id,
+                "income_account_id": cls.tour_income_account.id,
+            }
+        )
+        cls.tour_restart_donation.action_cancel(cancel_reason=cls.tour_cancel_reason)
+
     def test_create(self):
         """Run the create tour for ``donation``.
 
@@ -189,5 +236,27 @@ class TestUiDonation(HttpSavepointCase):
         self.start_tour(
             "/web",
             "ssi_donation_donation_cancel",
+            login="admin",
+        )
+
+    def test_reject(self):
+        """Run the reject tour for ``donation``.
+
+        IK: docs/donation/06-reject.md
+        """
+        self.start_tour(
+            "/web",
+            "ssi_donation_donation_reject",
+            login="admin",
+        )
+
+    def test_restart(self):
+        """Run the restart tour for ``donation``.
+
+        IK: docs/donation/12-restart.md
+        """
+        self.start_tour(
+            "/web",
+            "ssi_donation_donation_restart",
             login="admin",
         )

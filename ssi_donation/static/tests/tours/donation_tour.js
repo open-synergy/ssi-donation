@@ -316,4 +316,104 @@ odoo.define("ssi_donation.donation_tour", function (require) {
             },
         ])
     );
+
+    // IK: docs/donation/06-reject.md
+    tour.register(
+        "ssi_donation_donation_reject",
+        {
+            test: true,
+            url: "/web",
+        },
+        [].concat(openDonationsMenu(), [
+            // ── Flow 2 — Open the record to reject.
+            {
+                content: "Open the donation to reject",
+                trigger:
+                    ".o_data_row:contains(Tour Donation Reject Donor) .o_data_cell:first",
+                extra_trigger: ".o_list_view",
+            },
+            {
+                content: "Form is open",
+                trigger: ".o_form_view",
+                run: function () {
+                    // Assertion only; do not trigger the default click.
+                },
+            },
+
+            // ── Flow 3 — Click the Reject button.
+            {
+                content: "Click the Reject button",
+                trigger: ".o_statusbar_buttons button[name='action_reject_approval']",
+                extra_trigger: ".o_form_view",
+            },
+
+            // ── Flow 4 — Click OK on the confirmation dialog.
+            {
+                content: "Confirm the dialog",
+                trigger: ".modal-footer button.btn-primary",
+                in_modal: true,
+            },
+
+            // ── Post-Condition — Status changes to Rejected.
+            {
+                content: "Status is Rejected",
+                trigger:
+                    ".o_statusbar_status .o_arrow_button[data-value='reject'].btn-primary",
+                extra_trigger: "body:not(:has(.modal))",
+                run: function () {
+                    // Assertion only; do not trigger the default click.
+                },
+            },
+        ])
+    );
+
+    // IK: docs/donation/12-restart.md
+    tour.register(
+        "ssi_donation_donation_restart",
+        {
+            test: true,
+            url: "/web",
+        },
+        [].concat(openDonationsMenu(), [
+            // ── Flow 2 — Open the record to restart.
+            {
+                content: "Open the donation to restart",
+                trigger:
+                    ".o_data_row:contains(Tour Donation Restart Donor) .o_data_cell:first",
+                extra_trigger: ".o_list_view",
+            },
+            {
+                content: "Form is open",
+                trigger: ".o_form_view",
+                run: function () {
+                    // Assertion only; do not trigger the default click.
+                },
+            },
+
+            // ── Flow 3 — Click the Restart button.
+            {
+                content: "Click the Restart button",
+                trigger: ".o_statusbar_buttons button[name='action_restart']",
+                extra_trigger: ".o_form_view",
+            },
+
+            // ── Flow 4 — Click OK on the confirmation dialog.
+            {
+                content: "Confirm the dialog",
+                trigger: ".modal-footer button.btn-primary",
+                in_modal: true,
+            },
+
+            // ── Post-Condition — Status returns to Draft.
+            {
+                content: "Status is Draft",
+                trigger:
+                    ".o_statusbar_status .o_arrow_button[data-value='draft'].btn-primary",
+                extra_trigger: "body:not(:has(.modal))",
+                run: function () {
+                    // Assertion only; do not trigger the default click.
+                },
+            },
+        ])
+    );
 });
