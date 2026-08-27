@@ -92,6 +92,30 @@
                         options="{'currency_field': 'company_currency_id'}"
                     />
             </xpath>
+            <xpath expr="//page[@name='note']" position="after">
+                <page name="usage" string="Usage">
+                    <field name="usage_ids" readonly="1">
+                        <tree create="false" edit="false" delete="false">
+                            <field name="model_id" />
+                            <field name="res_id" />
+                            <field name="state" />
+                            <field name="amount_committed" widget="monetary" />
+                            <field name="amount_realized" widget="monetary" />
+                            <field name="currency_id" invisible="1" />
+                        </tree>
+                        <form create="false" edit="false" delete="false">
+                            <group>
+                                <field name="model_id" />
+                                <field name="res_id" />
+                                <field name="state" />
+                                <field name="amount_committed" widget="monetary" />
+                                <field name="amount_realized" widget="monetary" />
+                                <field name="currency_id" invisible="1" />
+                            </group>
+                        </form>
+                    </field>
+                </page>
+            </xpath>
         </data>
     </field>
 </record>

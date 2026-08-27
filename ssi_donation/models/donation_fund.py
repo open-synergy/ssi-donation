@@ -13,13 +13,14 @@ class DonationFund(models.Model):
     how that money may be used.
     A fund never holds money by itself — the ``donation`` receipt
     document credits the bound analytic account when money comes in
-    (reflected here as ``amount_received``), and the document that uses
-    the money debits it. This model only carries the dimension
-    (``analytic_account_id``) and the donor restriction terms (PSAK 45 /
-    ISAK 35: "with donor restriction" vs "without donor restriction");
-    ``amount_committed``/``amount_realized`` remain placeholder zero
-    since the documents that commit/realize money from a fund are not
-    part of this item's scope and are wired up in a later item.
+    (reflected here as ``amount_received``), and any model that
+    inherits ``mixin.donation_fund_consumer`` debits it (reflected as
+    ``amount_committed``/``amount_realized``, totalled from the
+    ``donation_fund_usage`` ledger) when the money is used. This
+    model only carries the dimension (``analytic_account_id``) and
+    the donor restriction terms (PSAK 45 / ISAK 35: "with donor
+    restriction" vs "without donor restriction") -- it never learns
+    the name of any consumer model.
     """
 
     _name = "donation_fund"
@@ -94,16 +95,25 @@ class DonationFund(models.Model):
         help="Total Amount of every ``donation`` document in state "
         "Done that points to this fund.",
     )
+    usage_ids = fields.One2many(
+        string="Usage",
+        comodel_name="donation_fund_usage",
+        inverse_name="fund_id",
+        help="Ledger of every consumer record committing or "
+        "realizing money from this fund, maintained automatically "
+        "by ``mixin.donation_fund_consumer`` -- this fund never "
+        "knows the name of any model that appears here.",
+    )
     amount_committed = fields.Monetary(
         string="Amount Committed",
         currency_field="company_currency_id",
         compute="_compute_amount_committed",
         store=True,
         compute_sudo=True,
-        help="Total amount committed against this fund. Always zero "
-        "for now: the document that commits money from a fund is "
-        "not part of this item's scope and is wired up in a later "
-        "item.",
+        help="Total amount committed against this fund, summed from "
+        "``usage_ids``. A consumer record only contributes while "
+        "its own state is in its model's "
+        "``_donation_committed_states``.",
     )
     amount_realized = fields.Monetary(
         string="Amount Realized",
@@ -111,10 +121,8 @@ class DonationFund(models.Model):
         compute="_compute_amount_realized",
         store=True,
         compute_sudo=True,
-        help="Total amount already realized (actually spent) against "
-        "this fund. Always zero for now: the document that realizes "
-        "a commitment is not part of this item's scope and is wired "
-        "up in a later item.",
+        help="Total amount already realized (actually spent) "
+        "against this fund, summed from ``usage_ids``.",
     )
     amount_available = fields.Monetary(
         string="Amount Available",
@@ -142,31 +150,29 @@ class DonationFund(models.Model):
                     result += donation.amount
             record.amount_received = result
 
-    @api.depends()
+    @api.depends("usage_ids.amount_committed")
     def _compute_amount_committed(self):
-        """Return zero until a fund-consuming document exists.
-
-        No real dependency: the document that commits money from a
-        fund is not part of this item's scope, so the value is a
-        fixed placeholder wired up in a later item.
+        """Sum the Amount Committed of every usage ledger row.
 
         :return: nothing; assigns ``amount_committed``
         """
         for record in self:
-            record.amount_committed = 0.0
+            result = 0.0
+            for usage in record.usage_ids:
+                result += usage.amount_committed
+            record.amount_committed = result
 
-    @api.depends()
+    @api.depends("usage_ids.amount_realized")
     def _compute_amount_realized(self):
-        """Return zero until a commitment-realizing document exists.
-
-        No real dependency: the document that realizes a commitment
-        against a fund is not part of this item's scope, so the value
-        is a fixed placeholder wired up in a later item.
+        """Sum the Amount Realized of every usage ledger row.
 
         :return: nothing; assigns ``amount_realized``
         """
         for record in self:
-            record.amount_realized = 0.0
+            result = 0.0
+            for usage in record.usage_ids:
+                result += usage.amount_realized
+            record.amount_realized = result
 
     @api.depends("amount_received", "amount_committed")
     def _compute_amount_available(self):
