@@ -1,0 +1,195 @@
+scenarios:
+  - name: "Donation Fund - Create Without Restriction"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Donation Analytic 1"
+
+      - step: "Create the fund without a donor restriction"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund Unrestricted"
+          code: "TDON001"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Assert the fund was created and is unrestricted"
+        action: "assert"
+        target: "fund"
+        asserts:
+          id:
+            type: "value"
+            operator: "is_truthy"
+          restriction_type:
+            type: "value"
+            expected: "without_restriction"
+          amount_received:
+            type: "value"
+            expected: 0.0
+          amount_available:
+            type: "value"
+            expected: 0.0
+
+  - name: "Donation Fund - Create With Restriction"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Donation Analytic 2"
+
+      - step: "Create the net asset account"
+        action: "create"
+        model: "account.account"
+        save_as: "net_asset_account"
+        values:
+          name: "Test Net Asset Account 1"
+          code: "TDONNA001"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the fund with a complete donor restriction"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund Restricted"
+          code: "TDON002"
+          analytic_account_id: "REC: analytic_account.id"
+          restriction_type: "with_restriction"
+          restriction_note: "Only for scholarship disbursement."
+          net_asset_account_id: "REC: net_asset_account.id"
+
+      - step: "Assert the restricted fund was created"
+        action: "assert"
+        target: "fund"
+        asserts:
+          id:
+            type: "value"
+            operator: "is_truthy"
+          restriction_type:
+            type: "value"
+            expected: "with_restriction"
+          restriction_note:
+            type: "value"
+            expected: "Only for scholarship disbursement."
+          net_asset_account_id:
+            type: "m2o"
+            expected: "REC: net_asset_account"
+
+  - name: "Donation Fund - Create With Valid Restriction Window"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Donation Analytic 3"
+
+      - step: "Create the fund with a valid date window"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund Dated"
+          code: "TDON003"
+          analytic_account_id: "REC: analytic_account.id"
+          date_start: 2026-01-01
+          date_end: 2026-12-31
+
+      - step: "Assert the date window was saved"
+        action: "assert"
+        target: "fund"
+        asserts:
+          date_start:
+            type: "value"
+            expected: 2026-01-01
+          date_end:
+            type: "value"
+            expected: 2026-12-31
+
+  - name: "Donation Fund - Analytic Account Must Be Unique"
+    steps:
+      - step: "Create the analytic account to bind the first fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Donation Analytic 4"
+
+      - step: "Create the first fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "First Fund"
+          code: "TDON004"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "A second fund on the same analytic account must be rejected"
+        action: "create"
+        model: "donation_fund"
+        expect_error:
+          type: "ValidationError"
+          message_contains: "already used"
+        values:
+          name: "Second Fund"
+          code: "TDON005"
+          analytic_account_id: "REC: analytic_account.id"
+
+  - name: "Donation Fund - Restriction Note Required When Restricted"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Donation Analytic 5"
+
+      - step: "Create the net asset account"
+        action: "create"
+        model: "account.account"
+        save_as: "net_asset_account"
+        values:
+          name: "Test Net Asset Account 2"
+          code: "TDONNA002"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "A restricted fund without a Restriction Note must be rejected"
+        action: "create"
+        model: "donation_fund"
+        expect_error:
+          type: "ValidationError"
+          message_contains: "Restriction Note is required"
+        values:
+          name: "Fund Missing Note"
+          code: "TDON006"
+          analytic_account_id: "REC: analytic_account.id"
+          restriction_type: "with_restriction"
+          net_asset_account_id: "REC: net_asset_account.id"
+
+  - name: "Donation Fund - Restriction End Date Must Not Precede Start Date"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Donation Analytic 6"
+
+      - step: "A fund whose End Date precedes its Start Date must be rejected"
+        action: "create"
+        model: "donation_fund"
+        expect_error:
+          type: "ValidationError"
+          message_contains: "earlier than"
+        values:
+          name: "Fund Bad Date Window"
+          code: "TDON007"
+          analytic_account_id: "REC: analytic_account.id"
+          date_start: 2026-06-01
+          date_end: 2026-01-01

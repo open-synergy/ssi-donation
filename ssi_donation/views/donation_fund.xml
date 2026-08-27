@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 OpenSynergy Indonesia
+     Copyright 2026 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+<record id="donation_fund_view_search" model="ir.ui.view">
+    <field name="name">donation_fund - search</field>
+    <field name="model">donation_fund</field>
+    <field
+            name="inherit_id"
+            ref="ssi_master_data_mixin.mixin_master_data_view_search"
+        />
+    <field name="mode">primary</field>
+    <field name="arch" type="xml">
+        <data>
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="analytic_account_id" />
+                <field name="restriction_type" />
+            </xpath>
+            <xpath expr="//search" position="inside">
+                <group expand="0" string="Group By">
+                    <filter
+                            name="group_by_restriction_type"
+                            string="Restriction Type"
+                            context="{'group_by': 'restriction_type'}"
+                        />
+                </group>
+            </xpath>
+        </data>
+    </field>
+</record>
+
+<record id="donation_fund_view_tree" model="ir.ui.view">
+    <field name="name">donation_fund - tree</field>
+    <field name="model">donation_fund</field>
+    <field name="inherit_id" ref="ssi_master_data_mixin.mixin_master_data_view_tree" />
+    <field name="mode">primary</field>
+    <field name="arch" type="xml">
+        <data>
+            <xpath expr="//field[@name='code']" position="after">
+                <field name="analytic_account_id" />
+                <field name="restriction_type" />
+                <field name="amount_received" widget="monetary" optional="hide" />
+                <field name="amount_committed" widget="monetary" optional="hide" />
+                <field name="amount_available" widget="monetary" />
+                <field name="company_currency_id" invisible="1" />
+            </xpath>
+        </data>
+    </field>
+</record>
+
+<record id="donation_fund_view_form" model="ir.ui.view">
+    <field name="name">donation_fund - form</field>
+    <field name="model">donation_fund</field>
+    <field name="inherit_id" ref="ssi_master_data_mixin.mixin_master_data_view_form" />
+    <field name="mode">primary</field>
+    <field name="arch" type="xml">
+        <data>
+            <xpath expr="//field[@name='active']" position="after">
+                <field name="analytic_account_id" />
+                <field name="restriction_type" />
+                <field
+                        name="restriction_note"
+                        attrs="{'required': [('restriction_type', '=', 'with_restriction')], 'invisible': [('restriction_type', '!=', 'with_restriction')]}"
+                    />
+                <field
+                        name="net_asset_account_id"
+                        attrs="{'required': [('restriction_type', '=', 'with_restriction')], 'invisible': [('restriction_type', '!=', 'with_restriction')]}"
+                    />
+                <field name="date_start" />
+                <field name="date_end" />
+                <field name="company_id" groups="base.group_multi_company" />
+                <field name="company_currency_id" groups="base.group_multi_currency" />
+                <field
+                        name="amount_received"
+                        widget="monetary"
+                        options="{'currency_field': 'company_currency_id'}"
+                    />
+                <field
+                        name="amount_committed"
+                        widget="monetary"
+                        options="{'currency_field': 'company_currency_id'}"
+                    />
+                <field
+                        name="amount_realized"
+                        widget="monetary"
+                        options="{'currency_field': 'company_currency_id'}"
+                    />
+                <field
+                        name="amount_available"
+                        widget="monetary"
+                        options="{'currency_field': 'company_currency_id'}"
+                    />
+            </xpath>
+        </data>
+    </field>
+</record>
+
+<record id="donation_fund_action" model="ir.actions.act_window">
+    <field name="name">Donation Funds</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">donation_fund</field>
+    <field name="view_mode">tree,form</field>
+</record>
+
+<menuitem
+        id="donation_fund_menu"
+        name="Donation Funds"
+        parent="menu_donation_configuration"
+        action="donation_fund_action"
+        groups="donation_fund_group"
+        sequence="10"
+    />
+
+</odoo>
