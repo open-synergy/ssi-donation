@@ -1,0 +1,403 @@
+scenarios:
+  - name: "Consumer Mixin - Committed State Creates And Feeds Ledger"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Consumer Analytic 1"
+
+      - step: "Create the fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund Consumer 1"
+          code: "TDONU001"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create a Done consumer record pointing to the fund"
+        action: "create"
+        model: "test.donation_fund_consumer_one"
+        save_as: "consumer"
+        values:
+          name: "Doc Consumer 1"
+          state: "done"
+          committed_amount: 100.0
+          realized_amount: 40.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Assert the consumer's analytic account mirrors the fund's"
+        action: "assert"
+        target: "consumer"
+        asserts:
+          donation_analytic_account_id:
+            type: "m2o"
+            expected: "REC: analytic_account"
+
+      - step: "Assert the fund totalled the ledger row"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_committed:
+            type: "value"
+            expected: 100.0
+          amount_realized:
+            type: "value"
+            expected: 40.0
+          amount_available:
+            type: "value"
+            expected: -100.0
+          usage_ids:
+            type: "o2m"
+            check: "count"
+            expected_count: 1
+
+  - name: "Consumer Mixin - Changing Committed Value Updates Ledger And Fund"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Consumer Analytic 2"
+
+      - step: "Create the fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund Consumer 2"
+          code: "TDONU002"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create a Done consumer record"
+        action: "create"
+        model: "test.donation_fund_consumer_one"
+        save_as: "consumer"
+        values:
+          name: "Doc Consumer 2"
+          state: "done"
+          committed_amount: 50.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Assert the fund committed 50"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_committed:
+            type: "value"
+            expected: 50.0
+
+      - step: "Raise the consumer's committed amount"
+        action: "write"
+        target: "consumer"
+        values:
+          committed_amount: 80.0
+
+      - step: "Assert the fund followed the new committed amount"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_committed:
+            type: "value"
+            expected: 80.0
+
+  - name: "Consumer Mixin - Leaving Committed States Zeroes Fund Committed"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Consumer Analytic 3"
+
+      - step: "Create the fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund Consumer 3"
+          code: "TDONU003"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create a Done consumer record"
+        action: "create"
+        model: "test.donation_fund_consumer_one"
+        save_as: "consumer"
+        values:
+          name: "Doc Consumer 3"
+          state: "done"
+          committed_amount: 60.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Assert the fund committed 60"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_committed:
+            type: "value"
+            expected: 60.0
+
+      - step: "Move the consumer out of the committed states"
+        action: "write"
+        target: "consumer"
+        values:
+          state: "draft"
+
+      - step: "Assert the fund's committed amount fell to zero, row stays"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_committed:
+            type: "value"
+            expected: 0.0
+          usage_ids:
+            type: "o2m"
+            check: "count"
+            expected_count: 1
+
+  - name: "Consumer Mixin - Delete Removes Ledger Row And Restores Balance"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Consumer Analytic 4"
+
+      - step: "Create the fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund Consumer 4"
+          code: "TDONU004"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create a Done consumer record"
+        action: "create"
+        model: "test.donation_fund_consumer_one"
+        save_as: "consumer"
+        values:
+          name: "Doc Consumer 4"
+          state: "done"
+          committed_amount: 70.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Assert the fund committed 70 with one ledger row"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_committed:
+            type: "value"
+            expected: 70.0
+          usage_ids:
+            type: "o2m"
+            check: "count"
+            expected_count: 1
+
+      - step: "Delete the consumer record"
+        action: "unlink"
+        target: "consumer"
+
+      - step: "Assert the ledger row is gone and the balance is restored"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_committed:
+            type: "value"
+            expected: 0.0
+          usage_ids:
+            type: "o2m"
+            check: "count"
+            expected_count: 0
+
+  - name: "Consumer Mixin - Two Different Consumer Models Sum On Same Fund"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Consumer Analytic 5"
+
+      - step: "Create the fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund Consumer 5"
+          code: "TDONU005"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create a Done record of the first consumer model"
+        action: "create"
+        model: "test.donation_fund_consumer_one"
+        save_as: "consumer_one"
+        values:
+          name: "Doc Consumer One"
+          state: "done"
+          committed_amount: 30.0
+          realized_amount: 10.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Create a Done record of the second, differently-shaped model"
+        action: "create"
+        model: "test.donation_fund_consumer_two"
+        save_as: "consumer_two"
+        values:
+          name: "Doc Consumer Two"
+          state: "done"
+          commit_value: 45.0
+          realize_value: 15.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Assert both consumers' contributions are summed"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_committed:
+            type: "value"
+            expected: 75.0
+          amount_realized:
+            type: "value"
+            expected: 25.0
+          usage_ids:
+            type: "o2m"
+            check: "count"
+            expected_count: 2
+
+  - name: "Consumer Mixin - Committed States Are Configured Per Model"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Consumer Analytic 6"
+
+      - step: "Create the fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund Consumer 6"
+          code: "TDONU006"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create an Open record of the second model (only Done counts for it)"
+        action: "create"
+        model: "test.donation_fund_consumer_two"
+        save_as: "consumer_two"
+        values:
+          name: "Doc Consumer Two Open"
+          state: "open"
+          commit_value: 99.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Assert Open does not count as committed for this model"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_committed:
+            type: "value"
+            expected: 0.0
+
+  - name: "Consumer Mixin - Bare Consumer Without Attributes Yields Zero"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Consumer Analytic 7"
+
+      - step: "Create the fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund Consumer 7"
+          code: "TDONU007"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create a bare consumer record, no _donation_* attribute set"
+        action: "create"
+        model: "test.donation_fund_consumer_bare"
+        save_as: "consumer"
+        values:
+          name: "Doc Consumer Bare"
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Assert a zeroed ledger row was created, without error"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_committed:
+            type: "value"
+            expected: 0.0
+          amount_realized:
+            type: "value"
+            expected: 0.0
+          usage_ids:
+            type: "o2m"
+            check: "count"
+            expected_count: 1
+
+  - name: "Consumer Mixin - Direct Write By Donation Fund Group Denied"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Consumer Analytic 8"
+
+      - step: "Create the fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund Consumer 8"
+          code: "TDONU008"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create a Done consumer record"
+        action: "create"
+        model: "test.donation_fund_consumer_one"
+        save_as: "consumer"
+        values:
+          name: "Doc Consumer 8"
+          state: "done"
+          committed_amount: 15.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Find the ledger row the mixin created"
+        action: "search"
+        model: "donation_fund_usage"
+        save_as: "usage_row"
+        domain: [["fund_id", "=", "REC: fund.id"]]
+        limit: 1
+        expect_count: 1
+
+      - step: "A Donation Fund group member cannot write it directly"
+        action: "write"
+        target: "usage_row"
+        as_user: "base.user_admin"
+        expect_error:
+          type: "AccessError"
+          message_contains: "not allowed"
+        values:
+          amount_committed: 999.0

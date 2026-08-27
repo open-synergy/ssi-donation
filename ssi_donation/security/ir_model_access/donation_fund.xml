@@ -21,4 +21,17 @@
     <field name="perm_unlink" eval="1" />
 </record>
 
+<!-- donation_fund_usage: read-only technical ledger, tab of donation_fund.
+     Write/create/unlink are 0 for everyone; rows are maintained only by
+     mixin.donation_fund_consumer through sudo(). -->
+<record id="donation_fund_usage_user_access" model="ir.model.access">
+    <field name="name">donation_fund_usage - user</field>
+    <field name="model_id" ref="model_donation_fund_usage" />
+    <field name="group_id" ref="donation_fund_group" />
+    <field name="perm_read" eval="1" />
+    <field name="perm_write" eval="0" />
+    <field name="perm_create" eval="0" />
+    <field name="perm_unlink" eval="0" />
+</record>
+
 </odoo>
