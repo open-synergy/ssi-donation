@@ -225,12 +225,18 @@ odoo.define("ssi_donation.donation_restriction_release_tour", function (require)
             },
             {
                 // ``move_id`` is a readonly many2one; once filled in
-                // 14.0 renders it as `<a class="o_form_uri">` -- an
-                // empty readonly m2o has zero size and would fail
-                // this gate (skill odoo-development-ui-test
+                // 14.0 renders it AS `<a class="o_form_uri">` itself --
+                // not as a child of `.o_field_widget[name='move_id']`.
+                // abstract_field.js attaches both `name=` and
+                // `o_field_widget` to that same root `<a>`, so a
+                // selector looking for a descendant `<a>` never
+                // matches. An empty readonly m2o also renders
+                // `o_form_uri` (with `href="#"` and no id/model in the
+                // href), so `:not(.o_field_empty)` guards the "filled
+                // in" semantics (skill odoo-development-ui-test
                 // selectors.md, "Field readonly yang KOSONG").
                 content: "Move field is filled in",
-                trigger: ".o_field_widget[name='move_id'] a.o_form_uri",
+                trigger: "a.o_form_uri[name='move_id']:not(.o_field_empty)",
                 run: function () {
                     // Assertion only; do not trigger the default click.
                 },
