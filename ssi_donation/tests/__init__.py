@@ -6,6 +6,7 @@ from . import test_donation_fund
 from . import test_donation_fund_usage
 from . import test_donation_type
 from . import test_donation
+from . import test_donation_restriction_release
 from . import test_ui_donation_fund
 from . import test_ui_donation_type
 from . import test_ui_donation

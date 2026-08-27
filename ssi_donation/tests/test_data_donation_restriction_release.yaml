@@ -1,0 +1,1487 @@
+# No shared `setup:` block on purpose. Every scenario in this file runs
+# inside the SAME database transaction (odoo-yaml-test replays `setup:`
+# in full for every scenario, without a savepoint), so a fixture shared
+# via `setup:` would recreate the same unique codes on every replay and
+# fail with "Duplicate code" from the second scenario onward. Instead,
+# each scenario builds its own self-contained fixture chain with a
+# scenario-unique code suffix -- the same pattern already used by
+# test_data_donation.yaml in this module.
+
+scenarios:
+  - name: "Restriction Release - Full Workflow Posts A Balanced Journal"
+    steps:
+      - step: "Create the analytic account the fund is bound to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Release Analytic R1"
+
+      - step: "Create the fund's own Net Asset Account"
+        action: "create"
+        model: "account.account"
+        save_as: "fund_net_asset_account"
+        values:
+          name: "Test Release Fund Net Asset R1"
+          code: "TRRFNA01"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the donor-restricted fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Restricted Fund R1"
+          code: "TRRFD01"
+          analytic_account_id: "REC: analytic_account.id"
+          restriction_type: "with_restriction"
+          restriction_note: "Scholarship disbursement only."
+          net_asset_account_id: "REC: fund_net_asset_account.id"
+
+      - step: "Record realized usage against the fund"
+        action: "create"
+        model: "test.donation_fund_consumer_one"
+        save_as: "consumer"
+        values:
+          name: "Doc Release Consumer R1"
+          state: "done"
+          realized_amount: 100000.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Assert the fund's Amount Realized reflects the usage"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_realized:
+            type: "value"
+            expected: 100000.0
+
+      - step: "Create the release journal (not Cash/Bank)"
+        action: "create"
+        model: "account.journal"
+        save_as: "release_journal"
+        values:
+          name: "Test Release Journal R1"
+          code: "TRRJ01"
+          type: "general"
+
+      - step: "Create the Net Assets Released From Restriction account"
+        action: "create"
+        model: "account.account"
+        save_as: "released_account"
+        values:
+          name: "Test Net Assets Released R1"
+          code: "TRRNAR01"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the Net Assets Reclassified Without Restriction account"
+        action: "create"
+        model: "account.account"
+        save_as: "reclassified_account"
+        values:
+          name: "Test Net Assets Reclassified R1"
+          code: "TRRNAC01"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the donation type's own base accounting fields"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Release Type Income R1"
+          code: "TRRIN01"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the donation type's receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Release Type Receivable R1"
+          code: "TRRRC01"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the donation type's own journal"
+        action: "create"
+        model: "account.journal"
+        save_as: "type_journal"
+        values:
+          name: "Test Release Type Journal R1"
+          code: "TRRTJ01"
+          type: "general"
+
+      - step: "Create the donation type, fully configured for release"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Release Type R1"
+          code: "TRRTY01"
+          journal_id: "REC: type_journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+          release_journal_id: "REC: release_journal.id"
+          net_asset_released_account_id: "REC: released_account.id"
+          net_asset_reclassified_account_id: "REC: reclassified_account.id"
+
+      - step: "Create the restriction release"
+        action: "create"
+        model: "donation_restriction_release"
+        save_as: "release"
+        values:
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          amount: 40000.0
+          journal_id: "REC: release_journal.id"
+          debit_account_id: "REC: released_account.id"
+          credit_account_id: "REC: reclassified_account.id"
+
+      - step: "Assert the release starts in Draft with no move yet"
+        action: "assert"
+        target: "release"
+        asserts:
+          state:
+            type: "value"
+            expected: "draft"
+          move_id:
+            type: "value"
+            operator: "is_falsy"
+
+      - step: "Confirm the release"
+        action: "call"
+        target: "release"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+
+      - step: "Approve the release, which also runs Done"
+        action: "call"
+        target: "release"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+
+      - step: "Assert the accounting entry was created"
+        action: "assert"
+        target: "release"
+        asserts:
+          move_id:
+            type: "value"
+            operator: "is_truthy"
+
+      - step: "Assert the move has exactly two balanced lines"
+        action: "search"
+        model: "account.move.line"
+        domain: [["move_id", "=", "REC: release.move_id.id"]]
+        save_as: "move_lines_1"
+        expect_count: 2
+
+      - step: "Assert the fund's Amount Released reflects this release"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_released:
+            type: "value"
+            expected: 40000.0
+
+  - name: "Restriction Release - Both Journal Lines Carry The Fund's Analytic Account"
+    steps:
+      - step: "Create the analytic account the fund is bound to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Release Analytic R2"
+
+      - step: "Create the fund's own Net Asset Account"
+        action: "create"
+        model: "account.account"
+        save_as: "fund_net_asset_account"
+        values:
+          name: "Test Release Fund Net Asset R2"
+          code: "TRRFNA02"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the donor-restricted fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Restricted Fund R2"
+          code: "TRRFD02"
+          analytic_account_id: "REC: analytic_account.id"
+          restriction_type: "with_restriction"
+          restriction_note: "Scholarship disbursement only."
+          net_asset_account_id: "REC: fund_net_asset_account.id"
+
+      - step: "Record realized usage against the fund"
+        action: "create"
+        model: "test.donation_fund_consumer_one"
+        save_as: "consumer"
+        values:
+          name: "Doc Release Consumer R2"
+          state: "done"
+          realized_amount: 60000.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Create the release journal (not Cash/Bank)"
+        action: "create"
+        model: "account.journal"
+        save_as: "release_journal"
+        values:
+          name: "Test Release Journal R2"
+          code: "TRRJ02"
+          type: "general"
+
+      - step: "Create the Net Assets Released From Restriction account"
+        action: "create"
+        model: "account.account"
+        save_as: "released_account"
+        values:
+          name: "Test Net Assets Released R2"
+          code: "TRRNAR02"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the Net Assets Reclassified Without Restriction account"
+        action: "create"
+        model: "account.account"
+        save_as: "reclassified_account"
+        values:
+          name: "Test Net Assets Reclassified R2"
+          code: "TRRNAC02"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the donation type's own base accounting fields"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Release Type Income R2"
+          code: "TRRIN02"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the donation type's receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Release Type Receivable R2"
+          code: "TRRRC02"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the donation type's own journal"
+        action: "create"
+        model: "account.journal"
+        save_as: "type_journal"
+        values:
+          name: "Test Release Type Journal R2"
+          code: "TRRTJ02"
+          type: "general"
+
+      - step: "Create the donation type, fully configured for release"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Release Type R2"
+          code: "TRRTY02"
+          journal_id: "REC: type_journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+          release_journal_id: "REC: release_journal.id"
+          net_asset_released_account_id: "REC: released_account.id"
+          net_asset_reclassified_account_id: "REC: reclassified_account.id"
+
+      - step: "Create and complete the restriction release"
+        action: "create"
+        model: "donation_restriction_release"
+        save_as: "release"
+        values:
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          amount: 25000.0
+          journal_id: "REC: release_journal.id"
+          debit_account_id: "REC: released_account.id"
+          credit_account_id: "REC: reclassified_account.id"
+
+      - step: "Confirm the release"
+        action: "call"
+        target: "release"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+
+      - step: "Approve the release, which also runs Done"
+        action: "call"
+        target: "release"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+
+      - step: "Assert exactly one debit line carries the fund's analytic account"
+        action: "search"
+        model: "account.move.line"
+        domain:
+          [
+            ["move_id", "=", "REC: release.move_id.id"],
+            ["debit", ">", 0],
+            ["analytic_account_id", "=", "REC: analytic_account.id"],
+          ]
+        save_as: "debit_lines_with_analytic"
+        expect_count: 1
+
+      - step: "Assert exactly one credit line carries the fund's analytic account"
+        action: "search"
+        model: "account.move.line"
+        domain:
+          [
+            ["move_id", "=", "REC: release.move_id.id"],
+            ["credit", ">", 0],
+            ["analytic_account_id", "=", "REC: analytic_account.id"],
+          ]
+        save_as: "credit_lines_with_analytic"
+        expect_count: 1
+
+  - name: "Restriction Release - Two Done Releases Sum Into Amount Released"
+    steps:
+      - step: "Create the analytic account the fund is bound to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Release Analytic R3"
+
+      - step: "Create the fund's own Net Asset Account"
+        action: "create"
+        model: "account.account"
+        save_as: "fund_net_asset_account"
+        values:
+          name: "Test Release Fund Net Asset R3"
+          code: "TRRFNA03"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the donor-restricted fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Restricted Fund R3"
+          code: "TRRFD03"
+          analytic_account_id: "REC: analytic_account.id"
+          restriction_type: "with_restriction"
+          restriction_note: "Scholarship disbursement only."
+          net_asset_account_id: "REC: fund_net_asset_account.id"
+
+      - step: "Record realized usage against the fund"
+        action: "create"
+        model: "test.donation_fund_consumer_one"
+        save_as: "consumer"
+        values:
+          name: "Doc Release Consumer R3"
+          state: "done"
+          realized_amount: 200000.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Create the release journal (not Cash/Bank)"
+        action: "create"
+        model: "account.journal"
+        save_as: "release_journal"
+        values:
+          name: "Test Release Journal R3"
+          code: "TRRJ03"
+          type: "general"
+
+      - step: "Create the Net Assets Released From Restriction account"
+        action: "create"
+        model: "account.account"
+        save_as: "released_account"
+        values:
+          name: "Test Net Assets Released R3"
+          code: "TRRNAR03"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the Net Assets Reclassified Without Restriction account"
+        action: "create"
+        model: "account.account"
+        save_as: "reclassified_account"
+        values:
+          name: "Test Net Assets Reclassified R3"
+          code: "TRRNAC03"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the donation type's own base accounting fields"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Release Type Income R3"
+          code: "TRRIN03"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the donation type's receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Release Type Receivable R3"
+          code: "TRRRC03"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the donation type's own journal"
+        action: "create"
+        model: "account.journal"
+        save_as: "type_journal"
+        values:
+          name: "Test Release Type Journal R3"
+          code: "TRRTJ03"
+          type: "general"
+
+      - step: "Create the donation type, fully configured for release"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Release Type R3"
+          code: "TRRTY03"
+          journal_id: "REC: type_journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+          release_journal_id: "REC: release_journal.id"
+          net_asset_released_account_id: "REC: released_account.id"
+          net_asset_reclassified_account_id: "REC: reclassified_account.id"
+
+      - step: "Create and complete the first release"
+        action: "create"
+        model: "donation_restriction_release"
+        save_as: "release_1"
+        values:
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          amount: 50000.0
+          journal_id: "REC: release_journal.id"
+          debit_account_id: "REC: released_account.id"
+          credit_account_id: "REC: reclassified_account.id"
+
+      - step: "Confirm the first release"
+        action: "call"
+        target: "release_1"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+
+      - step: "Approve the first release, which also runs Done"
+        action: "call"
+        target: "release_1"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+
+      - step: "Create and complete the second release"
+        action: "create"
+        model: "donation_restriction_release"
+        save_as: "release_2"
+        values:
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          amount: 30000.0
+          journal_id: "REC: release_journal.id"
+          debit_account_id: "REC: released_account.id"
+          credit_account_id: "REC: reclassified_account.id"
+
+      - step: "Confirm the second release"
+        action: "call"
+        target: "release_2"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+
+      - step: "Approve the second release, which also runs Done"
+        action: "call"
+        target: "release_2"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+
+      - step: "Assert Amount Released equals the sum of both releases"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_released:
+            type: "value"
+            expected: 80000.0
+
+  - name: "Restriction Release - Amount Available Is Unaffected"
+    steps:
+      - step: "Create the analytic account the fund is bound to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Release Analytic R4"
+
+      - step: "Create the fund's own Net Asset Account"
+        action: "create"
+        model: "account.account"
+        save_as: "fund_net_asset_account"
+        values:
+          name: "Test Release Fund Net Asset R4"
+          code: "TRRFNA04"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the donor-restricted fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Restricted Fund R4"
+          code: "TRRFD04"
+          analytic_account_id: "REC: analytic_account.id"
+          restriction_type: "with_restriction"
+          restriction_note: "Scholarship disbursement only."
+          net_asset_account_id: "REC: fund_net_asset_account.id"
+
+      - step: "Record committed AND realized usage against the fund"
+        action: "create"
+        model: "test.donation_fund_consumer_one"
+        save_as: "consumer"
+        values:
+          name: "Doc Release Consumer R4"
+          state: "done"
+          committed_amount: 100000.0
+          realized_amount: 100000.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Assert Amount Available before any release"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_available:
+            type: "value"
+            expected: -100000.0
+
+      - step: "Create the release journal (not Cash/Bank)"
+        action: "create"
+        model: "account.journal"
+        save_as: "release_journal"
+        values:
+          name: "Test Release Journal R4"
+          code: "TRRJ04"
+          type: "general"
+
+      - step: "Create the Net Assets Released From Restriction account"
+        action: "create"
+        model: "account.account"
+        save_as: "released_account"
+        values:
+          name: "Test Net Assets Released R4"
+          code: "TRRNAR04"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the Net Assets Reclassified Without Restriction account"
+        action: "create"
+        model: "account.account"
+        save_as: "reclassified_account"
+        values:
+          name: "Test Net Assets Reclassified R4"
+          code: "TRRNAC04"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the donation type's own base accounting fields"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Release Type Income R4"
+          code: "TRRIN04"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the donation type's receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Release Type Receivable R4"
+          code: "TRRRC04"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the donation type's own journal"
+        action: "create"
+        model: "account.journal"
+        save_as: "type_journal"
+        values:
+          name: "Test Release Type Journal R4"
+          code: "TRRTJ04"
+          type: "general"
+
+      - step: "Create the donation type, fully configured for release"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Release Type R4"
+          code: "TRRTY04"
+          journal_id: "REC: type_journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+          release_journal_id: "REC: release_journal.id"
+          net_asset_released_account_id: "REC: released_account.id"
+          net_asset_reclassified_account_id: "REC: reclassified_account.id"
+
+      - step: "Create and complete the restriction release"
+        action: "create"
+        model: "donation_restriction_release"
+        save_as: "release"
+        values:
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          amount: 40000.0
+          journal_id: "REC: release_journal.id"
+          debit_account_id: "REC: released_account.id"
+          credit_account_id: "REC: reclassified_account.id"
+
+      - step: "Confirm the release"
+        action: "call"
+        target: "release"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+
+      - step: "Approve the release, which also runs Done"
+        action: "call"
+        target: "release"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+
+      - step: "Assert Amount Available stayed exactly the same after Done"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_available:
+            type: "value"
+            expected: -100000.0
+
+  - name: "Restriction Release - Picking Type Defaults Journal And Both Accounts"
+    steps:
+      - step: "Create the analytic account the fund is bound to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Release Analytic R5"
+
+      - step: "Create the fund's own Net Asset Account"
+        action: "create"
+        model: "account.account"
+        save_as: "fund_net_asset_account"
+        values:
+          name: "Test Release Fund Net Asset R5"
+          code: "TRRFNA05"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the donor-restricted fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Restricted Fund R5"
+          code: "TRRFD05"
+          analytic_account_id: "REC: analytic_account.id"
+          restriction_type: "with_restriction"
+          restriction_note: "Scholarship disbursement only."
+          net_asset_account_id: "REC: fund_net_asset_account.id"
+
+      - step: "Create the release journal (not Cash/Bank)"
+        action: "create"
+        model: "account.journal"
+        save_as: "release_journal"
+        values:
+          name: "Test Release Journal R5"
+          code: "TRRJ05"
+          type: "general"
+
+      - step: "Create the Net Assets Released From Restriction account"
+        action: "create"
+        model: "account.account"
+        save_as: "released_account"
+        values:
+          name: "Test Net Assets Released R5"
+          code: "TRRNAR05"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the Net Assets Reclassified Without Restriction account"
+        action: "create"
+        model: "account.account"
+        save_as: "reclassified_account"
+        values:
+          name: "Test Net Assets Reclassified R5"
+          code: "TRRNAC05"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the donation type's own base accounting fields"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Release Type Income R5"
+          code: "TRRIN05"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the donation type's receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Release Type Receivable R5"
+          code: "TRRRC05"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the donation type's own journal"
+        action: "create"
+        model: "account.journal"
+        save_as: "type_journal"
+        values:
+          name: "Test Release Type Journal R5"
+          code: "TRRTJ05"
+          type: "general"
+
+      - step: "Create the donation type, fully configured for release"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Release Type R5"
+          code: "TRRTY05"
+          journal_id: "REC: type_journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+          release_journal_id: "REC: release_journal.id"
+          net_asset_released_account_id: "REC: released_account.id"
+          net_asset_reclassified_account_id: "REC: reclassified_account.id"
+
+      - step: "Pick the Type on a new release form and check the defaults"
+        action: "form"
+        model: "donation_restriction_release"
+        save: false
+        ops:
+          - set:
+              type_id: "REC: type"
+          - assert:
+              journal_id:
+                type: "m2o"
+                expected: "REC: release_journal"
+              debit_account_id:
+                type: "m2o"
+                expected: "REC: released_account"
+              credit_account_id:
+                type: "m2o"
+                expected: "REC: reclassified_account"
+
+  - name: "Restriction Release - Cancelling A Done Release Clears The Move"
+    steps:
+      - step: "Create the analytic account the fund is bound to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Release Analytic R6"
+
+      - step: "Create the fund's own Net Asset Account"
+        action: "create"
+        model: "account.account"
+        save_as: "fund_net_asset_account"
+        values:
+          name: "Test Release Fund Net Asset R6"
+          code: "TRRFNA06"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the donor-restricted fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Restricted Fund R6"
+          code: "TRRFD06"
+          analytic_account_id: "REC: analytic_account.id"
+          restriction_type: "with_restriction"
+          restriction_note: "Scholarship disbursement only."
+          net_asset_account_id: "REC: fund_net_asset_account.id"
+
+      - step: "Record realized usage against the fund"
+        action: "create"
+        model: "test.donation_fund_consumer_one"
+        save_as: "consumer"
+        values:
+          name: "Doc Release Consumer R6"
+          state: "done"
+          realized_amount: 90000.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Create the release journal (not Cash/Bank)"
+        action: "create"
+        model: "account.journal"
+        save_as: "release_journal"
+        values:
+          name: "Test Release Journal R6"
+          code: "TRRJ06"
+          type: "general"
+
+      - step: "Create the Net Assets Released From Restriction account"
+        action: "create"
+        model: "account.account"
+        save_as: "released_account"
+        values:
+          name: "Test Net Assets Released R6"
+          code: "TRRNAR06"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the Net Assets Reclassified Without Restriction account"
+        action: "create"
+        model: "account.account"
+        save_as: "reclassified_account"
+        values:
+          name: "Test Net Assets Reclassified R6"
+          code: "TRRNAC06"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the donation type's own base accounting fields"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Release Type Income R6"
+          code: "TRRIN06"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the donation type's receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Release Type Receivable R6"
+          code: "TRRRC06"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the donation type's own journal"
+        action: "create"
+        model: "account.journal"
+        save_as: "type_journal"
+        values:
+          name: "Test Release Type Journal R6"
+          code: "TRRTJ06"
+          type: "general"
+
+      - step: "Create the donation type, fully configured for release"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Release Type R6"
+          code: "TRRTY06"
+          journal_id: "REC: type_journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+          release_journal_id: "REC: release_journal.id"
+          net_asset_released_account_id: "REC: released_account.id"
+          net_asset_reclassified_account_id: "REC: reclassified_account.id"
+
+      - step: "Create and complete the restriction release"
+        action: "create"
+        model: "donation_restriction_release"
+        save_as: "release"
+        values:
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          amount: 45000.0
+          journal_id: "REC: release_journal.id"
+          debit_account_id: "REC: released_account.id"
+          credit_account_id: "REC: reclassified_account.id"
+
+      - step: "Confirm the release"
+        action: "call"
+        target: "release"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+
+      - step: "Approve the release, which also runs Done"
+        action: "call"
+        target: "release"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+
+      - step: "Assert Amount Released reflects the release before cancel"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_released:
+            type: "value"
+            expected: 45000.0
+
+      - step: "Create the cancellation reason"
+        action: "create"
+        model: "base.cancel_reason"
+        save_as: "cancel_reason"
+        values:
+          name: "Test Release Cancel Reason R6"
+          code: "TRRCR06"
+          global_use: true
+
+      - step: "Cancel the release through the cancel reason wizard"
+        action: "wizard"
+        model: "base.select_cancel_reason"
+        target: "release"
+        as_user: "base.user_admin"
+        values:
+          cancel_reason_id: "REC: cancel_reason"
+        method: "action_confirm"
+        refresh: true
+
+      - step: "Assert the move is cleared and the state is cancel"
+        action: "assert"
+        target: "release"
+        asserts:
+          state:
+            type: "value"
+            expected: "cancel"
+          move_id:
+            type: "value"
+            operator: "is_falsy"
+
+      - step: "Assert Amount Released dropped back to zero"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_released:
+            type: "value"
+            expected: 0.0
+
+  - name: "Restriction Release - Fund Without Restriction Is Rejected"
+    steps:
+      - step: "Create the analytic account the fund is bound to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Release Analytic R7"
+
+      - step: "Create the UNRESTRICTED fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Unrestricted Fund R7"
+          code: "TRRFD07"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create the release journal (not Cash/Bank)"
+        action: "create"
+        model: "account.journal"
+        save_as: "release_journal"
+        values:
+          name: "Test Release Journal R7"
+          code: "TRRJ07"
+          type: "general"
+
+      - step: "Create the Net Assets Released From Restriction account"
+        action: "create"
+        model: "account.account"
+        save_as: "released_account"
+        values:
+          name: "Test Net Assets Released R7"
+          code: "TRRNAR07"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the Net Assets Reclassified Without Restriction account"
+        action: "create"
+        model: "account.account"
+        save_as: "reclassified_account"
+        values:
+          name: "Test Net Assets Reclassified R7"
+          code: "TRRNAC07"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the donation type's own base accounting fields"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Release Type Income R7"
+          code: "TRRIN07"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the donation type's receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Release Type Receivable R7"
+          code: "TRRRC07"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the donation type's own journal"
+        action: "create"
+        model: "account.journal"
+        save_as: "type_journal"
+        values:
+          name: "Test Release Type Journal R7"
+          code: "TRRTJ07"
+          type: "general"
+
+      - step: "Create the donation type, fully configured for release"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Release Type R7"
+          code: "TRRTY07"
+          journal_id: "REC: type_journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+          release_journal_id: "REC: release_journal.id"
+          net_asset_released_account_id: "REC: released_account.id"
+          net_asset_reclassified_account_id: "REC: reclassified_account.id"
+
+      - step: "Record realized usage against the fund"
+        action: "create"
+        model: "test.donation_fund_consumer_one"
+        save_as: "consumer"
+        values:
+          name: "Doc Release Consumer R7"
+          state: "done"
+          realized_amount: 50000.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "A release against the unrestricted fund must be rejected"
+        action: "create"
+        model: "donation_restriction_release"
+        expect_error:
+          type: "ValidationError"
+          message_contains: "Restriction Type"
+        values:
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          amount: 10000.0
+          journal_id: "REC: release_journal.id"
+          debit_account_id: "REC: released_account.id"
+          credit_account_id: "REC: reclassified_account.id"
+
+  - name: "Restriction Release - Amount Exceeding Releasable Is Rejected"
+    steps:
+      - step: "Create the analytic account the fund is bound to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Release Analytic R8"
+
+      - step: "Create the fund's own Net Asset Account"
+        action: "create"
+        model: "account.account"
+        save_as: "fund_net_asset_account"
+        values:
+          name: "Test Release Fund Net Asset R8"
+          code: "TRRFNA08"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the donor-restricted fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Restricted Fund R8"
+          code: "TRRFD08"
+          analytic_account_id: "REC: analytic_account.id"
+          restriction_type: "with_restriction"
+          restriction_note: "Scholarship disbursement only."
+          net_asset_account_id: "REC: fund_net_asset_account.id"
+
+      - step: "Record realized usage against the fund"
+        action: "create"
+        model: "test.donation_fund_consumer_one"
+        save_as: "consumer"
+        values:
+          name: "Doc Release Consumer R8"
+          state: "done"
+          realized_amount: 50000.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Create the release journal (not Cash/Bank)"
+        action: "create"
+        model: "account.journal"
+        save_as: "release_journal"
+        values:
+          name: "Test Release Journal R8"
+          code: "TRRJ08"
+          type: "general"
+
+      - step: "Create the Net Assets Released From Restriction account"
+        action: "create"
+        model: "account.account"
+        save_as: "released_account"
+        values:
+          name: "Test Net Assets Released R8"
+          code: "TRRNAR08"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the Net Assets Reclassified Without Restriction account"
+        action: "create"
+        model: "account.account"
+        save_as: "reclassified_account"
+        values:
+          name: "Test Net Assets Reclassified R8"
+          code: "TRRNAC08"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the donation type's own base accounting fields"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Release Type Income R8"
+          code: "TRRIN08"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the donation type's receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Release Type Receivable R8"
+          code: "TRRRC08"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the donation type's own journal"
+        action: "create"
+        model: "account.journal"
+        save_as: "type_journal"
+        values:
+          name: "Test Release Type Journal R8"
+          code: "TRRTJ08"
+          type: "general"
+
+      - step: "Create the donation type, fully configured for release"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Release Type R8"
+          code: "TRRTY08"
+          journal_id: "REC: type_journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+          release_journal_id: "REC: release_journal.id"
+          net_asset_released_account_id: "REC: released_account.id"
+          net_asset_reclassified_account_id: "REC: reclassified_account.id"
+
+      - step: "A release exceeding the Releasable Amount must be rejected"
+        action: "create"
+        model: "donation_restriction_release"
+        expect_error:
+          type: "ValidationError"
+          message_contains: "Releasable Amount"
+        values:
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          amount: 60000.0
+          journal_id: "REC: release_journal.id"
+          debit_account_id: "REC: released_account.id"
+          credit_account_id: "REC: reclassified_account.id"
+
+  - name: "Restriction Release - Type Without Release Configuration Is Rejected"
+    steps:
+      - step: "Create the analytic account the fund is bound to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Release Analytic R9"
+
+      - step: "Create the fund's own Net Asset Account"
+        action: "create"
+        model: "account.account"
+        save_as: "fund_net_asset_account"
+        values:
+          name: "Test Release Fund Net Asset R9"
+          code: "TRRFNA09"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the donor-restricted fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Restricted Fund R9"
+          code: "TRRFD09"
+          analytic_account_id: "REC: analytic_account.id"
+          restriction_type: "with_restriction"
+          restriction_note: "Scholarship disbursement only."
+          net_asset_account_id: "REC: fund_net_asset_account.id"
+
+      - step: "Record ample realized usage against the fund"
+        action: "create"
+        model: "test.donation_fund_consumer_one"
+        save_as: "consumer"
+        values:
+          name: "Doc Release Consumer R9"
+          state: "done"
+          realized_amount: 999999.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Create the donation type's own base accounting fields"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Release Type Income R9"
+          code: "TRRIN09"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the donation type's receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Release Type Receivable R9"
+          code: "TRRRC09"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the donation type's own journal"
+        action: "create"
+        model: "account.journal"
+        save_as: "type_journal"
+        values:
+          name: "Test Release Type Journal R9"
+          code: "TRRTJ09"
+          type: "general"
+
+      - step: "Create a placeholder journal/account for the create call"
+        action: "create"
+        model: "account.journal"
+        save_as: "release_journal"
+        values:
+          name: "Test Release Journal R9"
+          code: "TRRJ09"
+          type: "general"
+
+      - step: "Create a placeholder debit/credit account for the create call"
+        action: "create"
+        model: "account.account"
+        save_as: "placeholder_account"
+        values:
+          name: "Test Release Placeholder Account R9"
+          code: "TRRPH09"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the donation type WITHOUT any release field filled"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Release Type R9"
+          code: "TRRTY09"
+          journal_id: "REC: type_journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+
+      - step: "A release using an unconfigured Type must be rejected"
+        action: "create"
+        model: "donation_restriction_release"
+        expect_error:
+          type: "ValidationError"
+          message_contains: "not configured for restriction release"
+        values:
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          amount: 1000.0
+          journal_id: "REC: release_journal.id"
+          debit_account_id: "REC: placeholder_account.id"
+          credit_account_id: "REC: placeholder_account.id"
+
+  - name: "Restriction Release - Amount Must Be Positive"
+    steps:
+      - step: "Create the analytic account the fund is bound to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Release Analytic R10"
+
+      - step: "Create the fund's own Net Asset Account"
+        action: "create"
+        model: "account.account"
+        save_as: "fund_net_asset_account"
+        values:
+          name: "Test Release Fund Net Asset R10"
+          code: "TRRFNA10"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the donor-restricted fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Restricted Fund R10"
+          code: "TRRFD10"
+          analytic_account_id: "REC: analytic_account.id"
+          restriction_type: "with_restriction"
+          restriction_note: "Scholarship disbursement only."
+          net_asset_account_id: "REC: fund_net_asset_account.id"
+
+      - step: "Record realized usage against the fund"
+        action: "create"
+        model: "test.donation_fund_consumer_one"
+        save_as: "consumer"
+        values:
+          name: "Doc Release Consumer R10"
+          state: "done"
+          realized_amount: 50000.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Create the release journal (not Cash/Bank)"
+        action: "create"
+        model: "account.journal"
+        save_as: "release_journal"
+        values:
+          name: "Test Release Journal R10"
+          code: "TRRJ10"
+          type: "general"
+
+      - step: "Create the Net Assets Released From Restriction account"
+        action: "create"
+        model: "account.account"
+        save_as: "released_account"
+        values:
+          name: "Test Net Assets Released R10"
+          code: "TRRNAR10"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the Net Assets Reclassified Without Restriction account"
+        action: "create"
+        model: "account.account"
+        save_as: "reclassified_account"
+        values:
+          name: "Test Net Assets Reclassified R10"
+          code: "TRRNAC10"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the donation type's own base accounting fields"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Release Type Income R10"
+          code: "TRRIN10"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the donation type's receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Release Type Receivable R10"
+          code: "TRRRC10"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the donation type's own journal"
+        action: "create"
+        model: "account.journal"
+        save_as: "type_journal"
+        values:
+          name: "Test Release Type Journal R10"
+          code: "TRRTJ10"
+          type: "general"
+
+      - step: "Create the donation type, fully configured for release"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Release Type R10"
+          code: "TRRTY10"
+          journal_id: "REC: type_journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+          release_journal_id: "REC: release_journal.id"
+          net_asset_released_account_id: "REC: released_account.id"
+          net_asset_reclassified_account_id: "REC: reclassified_account.id"
+
+      - step: "A release with a zero Amount must be rejected"
+        action: "create"
+        model: "donation_restriction_release"
+        expect_error:
+          type: "ValidationError"
+          message_contains: "zero or negative"
+        values:
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          amount: 0.0
+          journal_id: "REC: release_journal.id"
+          debit_account_id: "REC: released_account.id"
+          credit_account_id: "REC: reclassified_account.id"

@@ -133,6 +133,27 @@ class DonationFund(models.Model):
         help="Remaining amount this fund may still commit (Amount "
         "Received minus Amount Committed).",
     )
+    restriction_release_ids = fields.One2many(
+        string="Restriction Releases",
+        comodel_name="donation_restriction_release",
+        inverse_name="fund_id",
+        help="``donation_restriction_release`` documents pointing to "
+        "this fund, of any state. Not shown on any view -- it exists "
+        "only so ``amount_released`` recomputes when a Restriction "
+        "Release's state, Amount, or Fund changes.",
+    )
+    amount_released = fields.Monetary(
+        string="Amount Released",
+        currency_field="company_currency_id",
+        compute="_compute_amount_released",
+        store=True,
+        compute_sudo=True,
+        help="Total Amount of every ``donation_restriction_release`` "
+        "document in state Done that points to this fund -- the "
+        "portion of Amount Realized already reclassified out of "
+        "restricted net assets. Does not affect Amount Available: a "
+        "restriction release is a reclassification, not a spend.",
+    )
 
     @api.depends(
         "donation_ids.amount",
@@ -182,6 +203,22 @@ class DonationFund(models.Model):
         """
         for record in self:
             record.amount_available = record.amount_received - record.amount_committed
+
+    @api.depends(
+        "restriction_release_ids.amount",
+        "restriction_release_ids.state",
+    )
+    def _compute_amount_released(self):
+        """Sum the Amount of every Done restriction release on this fund.
+
+        :return: nothing; assigns ``amount_released``
+        """
+        for record in self:
+            result = 0.0
+            for release in record.restriction_release_ids:
+                if release.state == "done":
+                    result += release.amount
+            record.amount_released = result
 
     @api.constrains("analytic_account_id")
     def _check_analytic_account_id(self):
