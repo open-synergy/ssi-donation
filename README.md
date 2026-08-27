@@ -21,7 +21,8 @@ Available addons
 ----------------
 addon | version | maintainers | summary
 --- | --- | --- | ---
-[ssi_donation](ssi_donation/) | 14.0.1.2.0 |  | Donation
+[ssi_donation](ssi_donation/) | 14.0.1.3.0 |  | Donation
+[test_ssi_donation](test_ssi_donation/) | 14.0.1.0.0 |  | Test Module: Donation Fund Consumer Mixin
 
 [//]: # (end addons)
 
