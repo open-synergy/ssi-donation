@@ -1,0 +1,31 @@
+# Copyright 2026 OpenSynergy Indonesia
+# Copyright 2026 PT. Simetri Sinergi Indonesia
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+{
+    "name": "Donation",
+    "version": "14.0.1.0.0",
+    "website": "https://simetri-sinergi.id",
+    "author": "PT. Simetri Sinergi Indonesia, OpenSynergy Indonesia",
+    "contributors": [
+        "Andhitia Rama <andhitia.r@gmail.com>",
+    ],
+    "license": "AGPL-3",
+    "installable": True,
+    "application": True,
+    "depends": [
+        "ssi_master_data_mixin",
+        "ssi_financial_accounting",
+        "ssi_company_currency_mixin",
+        "web_tour",
+    ],
+    "data": [
+        "security/ir_module_category_data.xml",
+        "security/res_groups/donation_fund.xml",
+        "security/ir_model_access/donation_fund.xml",
+        "ir_sequence/donation_fund.xml",
+        "sequence_template/donation_fund.xml",
+        "menu.xml",
+        "views/donation_fund.xml",
+        "views/assets.xml",
+    ],
+}

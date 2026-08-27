@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 OpenSynergy Indonesia
+     Copyright 2026 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+<menuitem
+        id="menu_donation_root"
+        name="Donation"
+        web_icon="ssi_donation,static/description/icon.png"
+    />
+
+<menuitem
+        id="menu_donation_report"
+        name="Reporting"
+        parent="menu_donation_root"
+        sequence="998"
+    />
+
+<menuitem
+        id="menu_donation_configuration"
+        name="Configuration"
+        parent="menu_donation_root"
+        sequence="999"
+    />
+
+</odoo>
