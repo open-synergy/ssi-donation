@@ -13,6 +13,10 @@
                 type="text/javascript"
                 src="/ssi_donation/static/tests/tours/donation_fund_tour.js"
             />
+        <script
+                type="text/javascript"
+                src="/ssi_donation/static/tests/tours/donation_type_tour.js"
+            />
     </xpath>
 </template>
 </odoo>

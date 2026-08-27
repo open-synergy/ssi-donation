@@ -19,6 +19,11 @@ Donation Fund
 
 * `Create Donation Fund <docs/donation_fund/01-create.html>`_
 
+Donation Type
+-------------
+
+* `Create Donation Type <docs/donation_type/01-create.html>`_
+
 
 Installation
 ============
