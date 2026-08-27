@@ -7,3 +7,4 @@ from . import donation_fund_usage  # noqa: F401
 from . import donation_fund  # noqa: F401
 from . import donation_type  # noqa: F401
 from . import donation  # noqa: F401
+from . import donation_restriction_release  # noqa: F401
