@@ -21,7 +21,7 @@ Available addons
 ----------------
 addon | version | maintainers | summary
 --- | --- | --- | ---
-[ssi_donation](ssi_donation/) | 14.0.1.1.0 |  | Donation
+[ssi_donation](ssi_donation/) | 14.0.1.2.0 |  | Donation
 
 [//]: # (end addons)
 
