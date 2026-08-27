@@ -1,0 +1,13 @@
+# Copyright 2026 OpenSynergy Indonesia
+# Copyright 2026 PT. Simetri Sinergi Indonesia
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+#
+# test_ssi_donation is a test-only fixture module (mirrors the ssi-mixin
+# convention of a sibling `test_ssi_<mixin_module>` addon, e.g.
+# test_ssi_related_attachment_mixin) providing concrete models purely so
+# ssi_donation's own unit tests can exercise the AbstractModel
+# mixin.donation_fund_consumer, which cannot be instantiated directly.
+
+ik modul-tak-punya-direktori-docs-belum-ada-ik-sama-sekali|docs/ -- test-only fixture module with no end-user-facing UI; its concrete models exist solely to be inherited by mixin.donation_fund_consumer for tests, and per odoo-development-instruksi-kerja a model with no real user workflow gets no IK.
+
+unit-test modul-yang-mendefinisikan-model-punya-tests|tests-dir-hilang -- the actual scenario tests for these fixture models live in the provider module's own tests/ directory (ssi_donation/tests/test_donation_fund_usage.py), matching the established SSI convention for testing an AbstractModel mixin (e.g. ssi_related_attachment_mixin/tests/test_mixin_related_attachment.py tests test.related_attachment from test_ssi_related_attachment_mixin). A duplicate tests/ dir here would be redundant and never executed.
