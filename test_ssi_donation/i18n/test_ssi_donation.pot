@@ -16,6 +16,7 @@ msgstr ""
 #. module: test_ssi_donation
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_bare__name
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__name
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_rewrite__name
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__name
 msgid "# Document"
 msgstr ""
@@ -23,6 +24,7 @@ msgstr ""
 #. module: test_ssi_donation
 #: model:ir.model.fields,help:test_ssi_donation.field_test_donation_fund_consumer_bare__donation_analytic_account_id
 #: model:ir.model.fields,help:test_ssi_donation.field_test_donation_fund_consumer_one__donation_analytic_account_id
+#: model:ir.model.fields,help:test_ssi_donation.field_test_donation_fund_consumer_rewrite__donation_analytic_account_id
 #: model:ir.model.fields,help:test_ssi_donation.field_test_donation_fund_consumer_two__donation_analytic_account_id
 msgid ""
 "Analytic account of Donation Fund, exposed here so this record can be "
@@ -31,6 +33,7 @@ msgstr ""
 
 #. module: test_ssi_donation
 #: model:ir.model.fields.selection,name:test_ssi_donation.selection__test_donation_fund_consumer_one__state__cancel
+#: model:ir.model.fields.selection,name:test_ssi_donation.selection__test_donation_fund_consumer_rewrite__state__cancel
 #: model:ir.model.fields.selection,name:test_ssi_donation.selection__test_donation_fund_consumer_two__state__cancel
 msgid "Cancelled"
 msgstr ""
@@ -42,12 +45,14 @@ msgstr ""
 
 #. module: test_ssi_donation
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__committed_amount
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_rewrite__committed_amount
 msgid "Committed Amount"
 msgstr ""
 
 #. module: test_ssi_donation
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_bare__create_uid
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__create_uid
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_rewrite__create_uid
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__create_uid
 msgid "Created by"
 msgstr ""
@@ -55,12 +60,14 @@ msgstr ""
 #. module: test_ssi_donation
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_bare__create_date
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__create_date
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_rewrite__create_date
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__create_date
 msgid "Created on"
 msgstr ""
 
 #. module: test_ssi_donation
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__currency_id
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_rewrite__currency_id
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__currency_id
 msgid "Currency"
 msgstr ""
@@ -68,6 +75,7 @@ msgstr ""
 #. module: test_ssi_donation
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_bare__display_name
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__display_name
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_rewrite__display_name
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__display_name
 msgid "Display Name"
 msgstr ""
@@ -75,6 +83,7 @@ msgstr ""
 #. module: test_ssi_donation
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_bare__donation_analytic_account_id
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__donation_analytic_account_id
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_rewrite__donation_analytic_account_id
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__donation_analytic_account_id
 msgid "Donation Analytic Account"
 msgstr ""
@@ -82,6 +91,7 @@ msgstr ""
 #. module: test_ssi_donation
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_bare__donation_fund_id
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__donation_fund_id
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_rewrite__donation_fund_id
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__donation_fund_id
 msgid "Donation Fund"
 msgstr ""
@@ -89,6 +99,7 @@ msgstr ""
 #. module: test_ssi_donation
 #: model:ir.model.fields,help:test_ssi_donation.field_test_donation_fund_consumer_bare__donation_fund_id
 #: model:ir.model.fields,help:test_ssi_donation.field_test_donation_fund_consumer_one__donation_fund_id
+#: model:ir.model.fields,help:test_ssi_donation.field_test_donation_fund_consumer_rewrite__donation_fund_id
 #: model:ir.model.fields,help:test_ssi_donation.field_test_donation_fund_consumer_two__donation_fund_id
 msgid ""
 "Donation fund this record draws committed/realized money from. Leave empty "
@@ -97,12 +108,14 @@ msgstr ""
 
 #. module: test_ssi_donation
 #: model:ir.model.fields.selection,name:test_ssi_donation.selection__test_donation_fund_consumer_one__state__done
+#: model:ir.model.fields.selection,name:test_ssi_donation.selection__test_donation_fund_consumer_rewrite__state__done
 #: model:ir.model.fields.selection,name:test_ssi_donation.selection__test_donation_fund_consumer_two__state__done
 msgid "Done"
 msgstr ""
 
 #. module: test_ssi_donation
 #: model:ir.model.fields.selection,name:test_ssi_donation.selection__test_donation_fund_consumer_one__state__draft
+#: model:ir.model.fields.selection,name:test_ssi_donation.selection__test_donation_fund_consumer_rewrite__state__draft
 #: model:ir.model.fields.selection,name:test_ssi_donation.selection__test_donation_fund_consumer_two__state__draft
 msgid "Draft"
 msgstr ""
@@ -110,6 +123,7 @@ msgstr ""
 #. module: test_ssi_donation
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_bare__id
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__id
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_rewrite__id
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__id
 msgid "ID"
 msgstr ""
@@ -117,6 +131,7 @@ msgstr ""
 #. module: test_ssi_donation
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_bare____last_update
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one____last_update
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_rewrite____last_update
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two____last_update
 msgid "Last Modified on"
 msgstr ""
@@ -124,6 +139,7 @@ msgstr ""
 #. module: test_ssi_donation
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_bare__write_uid
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__write_uid
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_rewrite__write_uid
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__write_uid
 msgid "Last Updated by"
 msgstr ""
@@ -131,12 +147,14 @@ msgstr ""
 #. module: test_ssi_donation
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_bare__write_date
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__write_date
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_rewrite__write_date
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__write_date
 msgid "Last Updated on"
 msgstr ""
 
 #. module: test_ssi_donation
 #: model:ir.model.fields.selection,name:test_ssi_donation.selection__test_donation_fund_consumer_one__state__open
+#: model:ir.model.fields.selection,name:test_ssi_donation.selection__test_donation_fund_consumer_rewrite__state__open
 #: model:ir.model.fields.selection,name:test_ssi_donation.selection__test_donation_fund_consumer_two__state__open
 msgid "Open"
 msgstr ""
@@ -148,11 +166,13 @@ msgstr ""
 
 #. module: test_ssi_donation
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__realized_amount
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_rewrite__realized_amount
 msgid "Realized Amount"
 msgstr ""
 
 #. module: test_ssi_donation
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_one__state
+#: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_rewrite__state
 #: model:ir.model.fields,field_description:test_ssi_donation.field_test_donation_fund_consumer_two__state
 msgid "State"
 msgstr ""
@@ -170,4 +190,9 @@ msgstr ""
 #. module: test_ssi_donation
 #: model:ir.model,name:test_ssi_donation.model_test_donation_fund_consumer_two
 msgid "Test Donation Fund Consumer - Two"
+msgstr ""
+
+#. module: test_ssi_donation
+#: model:ir.model,name:test_ssi_donation.model_test_donation_fund_consumer_rewrite
+msgid "Test Donation Fund Consumer - Write Override"
 msgstr ""
