@@ -49,6 +49,15 @@ scenarios:
           user_type_id: "REF: account.data_account_type_receivable"
           reconcile: true
 
+      - step: "Create the cash account"
+        action: "create"
+        model: "account.account"
+        save_as: "cash_account"
+        values:
+          name: "Test Donation OU Cash P1"
+          code: "TDNOUCA1"
+          user_type_id: "REF: account.data_account_type_liquidity"
+
       - step: "Create the journal the donation is posted through"
         action: "create"
         model: "account.journal"
@@ -57,6 +66,7 @@ scenarios:
           name: "Test Donation OU Journal P1"
           code: "TDNOUJ1"
           type: "general"
+          default_account_id: "REC: cash_account.id"
 
       - step: "Create the donation type"
         action: "create"
@@ -237,6 +247,15 @@ scenarios:
           user_type_id: "REF: account.data_account_type_receivable"
           reconcile: true
 
+      - step: "Create the cash account"
+        action: "create"
+        model: "account.account"
+        save_as: "cash_account"
+        values:
+          name: "Test Donation OU Cash P2"
+          code: "TDNOUCA2"
+          user_type_id: "REF: account.data_account_type_liquidity"
+
       - step: "Create the journal the donation is posted through"
         action: "create"
         model: "account.journal"
@@ -245,6 +264,7 @@ scenarios:
           name: "Test Donation OU Journal P2"
           code: "TDNOUJ2"
           type: "general"
+          default_account_id: "REC: cash_account.id"
 
       - step: "Create the donation type"
         action: "create"
@@ -361,6 +381,15 @@ scenarios:
           user_type_id: "REF: account.data_account_type_receivable"
           reconcile: true
 
+      - step: "Create the cash account"
+        action: "create"
+        model: "account.account"
+        save_as: "cash_account"
+        values:
+          name: "Test Donation OU Cash P3"
+          code: "TDNOUCA3"
+          user_type_id: "REF: account.data_account_type_liquidity"
+
       - step: "Create the journal the donation is posted through"
         action: "create"
         model: "account.journal"
@@ -369,6 +398,7 @@ scenarios:
           name: "Test Donation OU Journal P3"
           code: "TDNOUJ3"
           type: "general"
+          default_account_id: "REC: cash_account.id"
 
       - step: "Create the donation type"
         action: "create"
@@ -545,6 +575,15 @@ scenarios:
           user_type_id: "REF: account.data_account_type_receivable"
           reconcile: true
 
+      - step: "Create the cash account"
+        action: "create"
+        model: "account.account"
+        save_as: "cash_account"
+        values:
+          name: "Test Donation OU Cash P4"
+          code: "TDNOUCA4"
+          user_type_id: "REF: account.data_account_type_liquidity"
+
       - step: "Create the journal the donation is posted through"
         action: "create"
         model: "account.journal"
@@ -553,6 +592,7 @@ scenarios:
           name: "Test Donation OU Journal P4"
           code: "TDNOUJ4"
           type: "general"
+          default_account_id: "REC: cash_account.id"
 
       - step: "Create the donation type"
         action: "create"
@@ -677,6 +717,15 @@ scenarios:
           user_type_id: "REF: account.data_account_type_receivable"
           reconcile: true
 
+      - step: "Create the cash account"
+        action: "create"
+        model: "account.account"
+        save_as: "cash_account"
+        values:
+          name: "Test Donation OU Cash P5"
+          code: "TDNOUCA5"
+          user_type_id: "REF: account.data_account_type_liquidity"
+
       - step: "Create the journal the donation is posted through"
         action: "create"
         model: "account.journal"
@@ -685,6 +734,7 @@ scenarios:
           name: "Test Donation OU Journal P5"
           code: "TDNOUJ5"
           type: "general"
+          default_account_id: "REC: cash_account.id"
 
       - step: "Create the donation type"
         action: "create"

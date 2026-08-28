@@ -41,6 +41,15 @@ scenarios:
           restriction_note: "Test restriction for OU release."
           net_asset_account_id: "REC: net_asset_account.id"
 
+      - step: "Create the cash account"
+        action: "create"
+        model: "account.account"
+        save_as: "cash_account"
+        values:
+          name: "Test Release OU Cash P1"
+          code: "TDRLOUCA1"
+          user_type_id: "REF: account.data_account_type_liquidity"
+
       - step: "Create the release journal"
         action: "create"
         model: "account.journal"
@@ -49,6 +58,7 @@ scenarios:
           name: "Test Release OU Journal P1"
           code: "TDRLOUJ1"
           type: "general"
+          default_account_id: "REC: cash_account.id"
 
       - step: "Create the released-from-restriction account"
         action: "create"
