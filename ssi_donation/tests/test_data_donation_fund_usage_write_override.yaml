@@ -1,0 +1,272 @@
+scenarios:
+  - name: "Consumer Mixin - Write Override Creates And Feeds Ledger"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Write Override Analytic 1"
+
+      - step: "Create the fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund Write Override 1"
+          code: "TDONW001"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create a Done consumer record overriding _write"
+        action: "create"
+        model: "test.donation_fund_consumer_rewrite"
+        save_as: "consumer"
+        values:
+          name: "Doc Write Override 1"
+          state: "done"
+          committed_amount: 90.0
+          realized_amount: 20.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Assert the fund totalled exactly one ledger row"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_committed:
+            type: "value"
+            expected: 90.0
+          amount_realized:
+            type: "value"
+            expected: 20.0
+          usage_ids:
+            type: "o2m"
+            check: "count"
+            expected_count: 1
+
+  - name: "Consumer Mixin - Write Override Changing Committed Value Updates Ledger"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Write Override Analytic 2"
+
+      - step: "Create the fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund Write Override 2"
+          code: "TDONW002"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create a Done consumer record overriding _write"
+        action: "create"
+        model: "test.donation_fund_consumer_rewrite"
+        save_as: "consumer"
+        values:
+          name: "Doc Write Override 2"
+          state: "done"
+          committed_amount: 40.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Assert the fund committed 40 with one ledger row"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_committed:
+            type: "value"
+            expected: 40.0
+          usage_ids:
+            type: "o2m"
+            check: "count"
+            expected_count: 1
+
+      - step: "Raise the consumer's committed amount"
+        action: "write"
+        target: "consumer"
+        values:
+          committed_amount: 65.0
+
+      - step: "Assert the fund followed the new amount, still one row"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_committed:
+            type: "value"
+            expected: 65.0
+          usage_ids:
+            type: "o2m"
+            check: "count"
+            expected_count: 1
+
+  - name:
+      "Consumer Mixin - Write Override Leaving Committed States Zeroes Fund Committed"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Write Override Analytic 3"
+
+      - step: "Create the fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund Write Override 3"
+          code: "TDONW003"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create a Done consumer record overriding _write"
+        action: "create"
+        model: "test.donation_fund_consumer_rewrite"
+        save_as: "consumer"
+        values:
+          name: "Doc Write Override 3"
+          state: "done"
+          committed_amount: 55.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Assert the fund committed 55"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_committed:
+            type: "value"
+            expected: 55.0
+
+      - step: "Move the consumer out of the committed states"
+        action: "write"
+        target: "consumer"
+        values:
+          state: "draft"
+
+      - step: "Assert the fund's committed amount fell to zero, row stays"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_committed:
+            type: "value"
+            expected: 0.0
+          usage_ids:
+            type: "o2m"
+            check: "count"
+            expected_count: 1
+
+  - name: "Consumer Mixin - Write Override And Plain Consumer Sum On Same Fund"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Write Override Analytic 4"
+
+      - step: "Create the fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund Write Override 4"
+          code: "TDONW004"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create a Done record of the _write-override consumer model"
+        action: "create"
+        model: "test.donation_fund_consumer_rewrite"
+        save_as: "consumer_rewrite"
+        values:
+          name: "Doc Write Override 4a"
+          state: "done"
+          committed_amount: 35.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Create a Done record of the plain consumer model"
+        action: "create"
+        model: "test.donation_fund_consumer_one"
+        save_as: "consumer_plain"
+        values:
+          name: "Doc Write Override 4b"
+          state: "done"
+          committed_amount: 15.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Assert both consumers' contributions are summed"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_committed:
+            type: "value"
+            expected: 50.0
+          usage_ids:
+            type: "o2m"
+            check: "count"
+            expected_count: 2
+
+  - name:
+      "Consumer Mixin - Write Override Delete Removes Ledger Row And Restores Balance"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Write Override Analytic 5"
+
+      - step: "Create the fund"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Fund Write Override 5"
+          code: "TDONW005"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create a Done consumer record overriding _write"
+        action: "create"
+        model: "test.donation_fund_consumer_rewrite"
+        save_as: "consumer"
+        values:
+          name: "Doc Write Override 5"
+          state: "done"
+          committed_amount: 75.0
+          donation_fund_id: "REC: fund.id"
+
+      - step: "Assert the fund committed 75 with one ledger row"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_committed:
+            type: "value"
+            expected: 75.0
+          usage_ids:
+            type: "o2m"
+            check: "count"
+            expected_count: 1
+
+      - step: "Delete the consumer record"
+        action: "unlink"
+        target: "consumer"
+
+      - step: "Assert the ledger row is gone and the balance is restored"
+        action: "assert"
+        target: "fund"
+        refresh: true
+        asserts:
+          amount_committed:
+            type: "value"
+            expected: 0.0
+          usage_ids:
+            type: "o2m"
+            check: "count"
+            expected_count: 0

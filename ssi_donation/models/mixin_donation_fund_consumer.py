@@ -142,6 +142,21 @@ class MixinDonationFundConsumer(models.AbstractModel):
         without direct write access to ``donation_fund_usage`` can
         still trigger this through an ordinary document edit.
 
+        ``usage`` is looked up a first time only to decide the
+        ``unlink`` branch cheaply; the value used for the
+        ``write``/``create`` branch below is looked up again right
+        before that branch, deliberately, because
+        ``_prepare_donation_fund_usage()`` reads fields off
+        ``record`` and that read can flush pending ORM writes. A
+        consumer that overrides the private ``_write()`` (a
+        legitimate pattern for stored compute fields, e.g.
+        ``school_scholarship_funding_source`` in
+        ``ssi_school_scholarship_donation``) then re-enters this
+        very method from inside that flush and may already create
+        the row before this call resumes; reusing the ``usage``
+        recordset captured before ``_prepare_donation_fund_usage()``
+        ran would then be stale and create a second, colliding row.
+
         :return: nothing
         """
         Usage = self.env["donation_fund_usage"].sudo()  # pylint: disable=invalid-name
@@ -158,6 +173,13 @@ class MixinDonationFundConsumer(models.AbstractModel):
                 usage.unlink()
                 continue
             values = record._prepare_donation_fund_usage()
+            usage = Usage.search(
+                [
+                    ("model_id", "=", model.id),
+                    ("res_id", "=", record.id),
+                ],
+                limit=1,
+            )
             if usage:
                 usage.write(values)
             else:
