@@ -1,0 +1,7 @@
+# Copyright 2026 OpenSynergy Indonesia
+# Copyright 2026 PT. Simetri Sinergi Indonesia
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+#
+# One line per accepted deviation: "<validator> <finding-key> -- <reason>".
+
+module direktori-views-jamak-bukan-view|view/ -- Operating Unit glue module: skill odoo-development references/odoo-module-guidelines/integrations/operating-unit.md (issue open-synergy/ssi-donation#18's own mandatory reference) explicitly requires the singular "view/" directory name for OU integration glue modules ("view/ # SINGULAR (bukan views)"), mirroring "security/res_group/" singular. The general 03-structure.md plural convention does not apply to this integration pattern.

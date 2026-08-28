@@ -1,0 +1,255 @@
+# No shared `setup:` block on purpose -- see donation_operating_unit.yaml
+# for why (setup: replays before every scenario in the same transaction,
+# so a shared fixture would collide on unique codes from the second
+# scenario onward). This file has a single scenario, so the point is
+# moot here, but the pattern is kept consistent with the rest of this
+# module's tests.
+
+options:
+  auto_refresh: true
+
+scenarios:
+  - name:
+      "Donation Restriction Release done by a user whose default OU differs from the
+      document's still propagates the document's OU to the accounting entry"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Release OU Analytic P1"
+
+      - step: "Create the net asset account"
+        action: "create"
+        model: "account.account"
+        save_as: "net_asset_account"
+        values:
+          name: "Test Release OU Net Asset P1"
+          code: "TDRLOUNA1"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the restricted fund, with usage already realized"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Release OU Restricted Fund P1"
+          code: "TDRLOUP1"
+          analytic_account_id: "REC: analytic_account.id"
+          restriction_type: "with_restriction"
+          restriction_note: "Test restriction for OU release."
+          net_asset_account_id: "REC: net_asset_account.id"
+
+      - step: "Create the cash account"
+        action: "create"
+        model: "account.account"
+        save_as: "cash_account"
+        values:
+          name: "Test Release OU Cash P1"
+          code: "TDRLOUCA1"
+          user_type_id: "REF: account.data_account_type_liquidity"
+
+      - step: "Create the release journal"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Release OU Journal P1"
+          code: "TDRLOUJ1"
+          type: "general"
+          default_account_id: "REC: cash_account.id"
+
+      - step: "Create the released-from-restriction account"
+        action: "create"
+        model: "account.account"
+        save_as: "released_account"
+        values:
+          name: "Test Release OU Released Account P1"
+          code: "TDRLOURL1"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the reclassified-without-restriction account"
+        action: "create"
+        model: "account.account"
+        save_as: "reclassified_account"
+        values:
+          name: "Test Release OU Reclassified Account P1"
+          code: "TDRLOURC1"
+          user_type_id: "REF: account.data_account_type_non_current_assets"
+
+      - step: "Create the donation type, fully configured for release"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Release OU Type P1"
+          code: "TDRLOUTY1"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: released_account.id"
+          receivable_account_id: "REC: released_account.id"
+          release_journal_id: "REC: journal.id"
+          net_asset_released_account_id: "REC: released_account.id"
+          net_asset_reclassified_account_id: "REC: reclassified_account.id"
+
+      - step: "Create the donor"
+        action: "create"
+        model: "res.partner"
+        save_as: "donor"
+        values:
+          name: "Test Donor Release OU P1"
+
+      - step: "Create a plain donation into the restricted fund, done"
+        action: "create"
+        model: "donation"
+        save_as: "donation"
+        values:
+          partner_id: "REC: donor.id"
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          amount: 500000.0
+          receipt_method: "cash"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: released_account.id"
+
+      - step: "Confirm the donation"
+        action: "call"
+        target: "donation"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+
+      - step: "Approve the donation, which also runs Done"
+        action: "call"
+        target: "donation"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+
+      - step: "Realize the fund's usage directly, so a release is possible"
+        action: "write"
+        target: "fund"
+        as_user: "base.user_admin"
+        values:
+          amount_realized: 500000.0
+
+      - step: "Create partner for operating unit A (the document's own OU)"
+        action: "create"
+        model: "res.partner"
+        save_as: "ou_a_partner"
+        values:
+          name: "Test Release OU-A Partner P1"
+
+      - step: "Create operating unit A"
+        action: "create"
+        model: "operating.unit"
+        save_as: "ou_a"
+        values:
+          name: "Test Release OU-A P1"
+          code: "TDRLOUA1"
+          partner_id: "REC: ou_a_partner.id"
+
+      - step: "Create partner for operating unit B (the acting user's own default OU)"
+        action: "create"
+        model: "res.partner"
+        save_as: "ou_b_partner"
+        values:
+          name: "Test Release OU-B Partner P1"
+
+      - step: "Create operating unit B"
+        action: "create"
+        model: "operating.unit"
+        save_as: "ou_b"
+        values:
+          name: "Test Release OU-B P1"
+          code: "TDRLOUB1"
+          partner_id: "REC: ou_b_partner.id"
+
+      - step:
+          "Create a user whose own default operating unit is B, member of the workflow
+          groups needed to confirm and approve"
+        action: "create"
+        model: "res.users"
+        save_as: "ou_b_user"
+        values:
+          name: "Release OU-B User P1"
+          login: "release_ou_b_user_p1"
+          default_operating_unit_id: "REC: ou_b.id"
+          assigned_operating_unit_ids:
+            - - 6
+              - 0
+              - - "REC: ou_b.id"
+          groups_id:
+            - - 6
+              - 0
+              - - "REF: base.group_user"
+                - "REF: ssi_donation.donation_restriction_release_user_group"
+                - "REF: ssi_donation.donation_restriction_release_validator_group"
+
+      - step: "Create the restriction release, scoped to operating unit A, as that user"
+        action: "create"
+        model: "donation_restriction_release"
+        save_as: "release"
+        as_user: "ou_b_user"
+        values:
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          operating_unit_id: "REC: ou_a.id"
+          amount: 200000.0
+          journal_id: "REC: journal.id"
+          debit_account_id: "REC: released_account.id"
+          credit_account_id: "REC: reclassified_account.id"
+
+      - step: "Confirm the release as that same user"
+        action: "call"
+        target: "release"
+        method: "action_confirm"
+        as_user: "ou_b_user"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+
+      - step: "Approve the release, which also runs Done, as that same user"
+        action: "call"
+        target: "release"
+        method: "action_approve_approval"
+        as_user: "ou_b_user"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+
+      - step:
+          "The generated move header carries operating unit A, not the acting user's own
+          default (B)"
+        action: "assert"
+        target: "release"
+        asserts:
+          move_id:
+            type: "value"
+            operator: "is_truthy"
+          move_id.operating_unit_id:
+            type: "m2o"
+            expected: "REC: ou_a"
+
+      - step: "Both journal items of the move carry operating unit A"
+        action: "search"
+        model: "account.move.line"
+        domain:
+          [
+            ["move_id", "=", "REC: release.move_id.id"],
+            ["operating_unit_id", "=", "REC: ou_a.id"],
+          ]
+        save_as: "move_lines_ou_a"
+        expect_count: 2

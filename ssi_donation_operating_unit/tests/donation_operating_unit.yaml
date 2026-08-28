@@ -1,0 +1,830 @@
+# No shared `setup:` block on purpose. `setup:` replays before every
+# scenario in the same transaction (no rollback in between), so a shared
+# fixture would recreate the same unique codes on every replay and fail
+# with "Duplicate code" from the second scenario onward -- the same
+# reasoning already documented in ssi_donation/tests/test_data_donation.yaml.
+# Each scenario below builds its own self-contained fixture chain with a
+# scenario-unique code suffix.
+
+options:
+  auto_refresh: true
+
+scenarios:
+  - name:
+      "Donation done by a user whose default OU differs from the document's still
+      propagates the document's OU to the accounting entry"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Donation OU Analytic P1"
+
+      - step: "Create the fund the donation is received into"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Donation OU Fund P1"
+          code: "TDNOUP1"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create the income account"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Donation OU Income P1"
+          code: "TDNOUIN1"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Donation OU Receivable P1"
+          code: "TDNOURC1"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the cash account"
+        action: "create"
+        model: "account.account"
+        save_as: "cash_account"
+        values:
+          name: "Test Donation OU Cash P1"
+          code: "TDNOUCA1"
+          user_type_id: "REF: account.data_account_type_liquidity"
+
+      - step: "Create the journal the donation is posted through"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Donation OU Journal P1"
+          code: "TDNOUJ1"
+          type: "general"
+          default_account_id: "REC: cash_account.id"
+
+      - step: "Create the donation type"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Donation OU Type P1"
+          code: "TDNOUTY1"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+
+      - step: "Create the donor"
+        action: "create"
+        model: "res.partner"
+        save_as: "donor"
+        values:
+          name: "Test Donor OU P1"
+
+      - step: "Create partner for operating unit A (the document's own OU)"
+        action: "create"
+        model: "res.partner"
+        save_as: "ou_a_partner"
+        values:
+          name: "Test Donation OU-A Partner P1"
+
+      - step: "Create operating unit A"
+        action: "create"
+        model: "operating.unit"
+        save_as: "ou_a"
+        values:
+          name: "Test Donation OU-A P1"
+          code: "TDNOUA1"
+          partner_id: "REC: ou_a_partner.id"
+
+      - step: "Create partner for operating unit B (the acting user's own default OU)"
+        action: "create"
+        model: "res.partner"
+        save_as: "ou_b_partner"
+        values:
+          name: "Test Donation OU-B Partner P1"
+
+      - step: "Create operating unit B"
+        action: "create"
+        model: "operating.unit"
+        save_as: "ou_b"
+        values:
+          name: "Test Donation OU-B P1"
+          code: "TDNOUB1"
+          partner_id: "REC: ou_b_partner.id"
+
+      - step:
+          "Create a user whose own default operating unit is B, member of the workflow
+          groups needed to confirm and approve"
+        action: "create"
+        model: "res.users"
+        save_as: "ou_b_user"
+        values:
+          name: "Donation OU-B User P1"
+          login: "donation_ou_b_user_p1"
+          default_operating_unit_id: "REC: ou_b.id"
+          assigned_operating_unit_ids:
+            - - 6
+              - 0
+              - - "REC: ou_b.id"
+          groups_id:
+            - - 6
+              - 0
+              - - "REF: base.group_user"
+                - "REF: ssi_donation.donation_user_group"
+                - "REF: ssi_donation.donation_validator_group"
+
+      - step: "Create the donation, scoped to operating unit A, as that user"
+        action: "create"
+        model: "donation"
+        save_as: "donation"
+        as_user: "ou_b_user"
+        values:
+          partner_id: "REC: donor.id"
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          operating_unit_id: "REC: ou_a.id"
+          amount: 300000.0
+          receipt_method: "cash"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+
+      - step: "The donation defaults its own OU to the explicit value, not B"
+        action: "assert"
+        target: "donation"
+        asserts:
+          operating_unit_id:
+            type: "m2o"
+            expected: "REC: ou_a"
+
+      - step: "Confirm the donation as that same user"
+        action: "call"
+        target: "donation"
+        method: "action_confirm"
+        as_user: "ou_b_user"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+
+      - step: "Approve the donation, which also runs Done, as that same user"
+        action: "call"
+        target: "donation"
+        method: "action_approve_approval"
+        as_user: "ou_b_user"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+
+      - step:
+          "The generated move header carries operating unit A, not the acting user's own
+          default (B)"
+        action: "assert"
+        target: "donation"
+        asserts:
+          move_id:
+            type: "value"
+            operator: "is_truthy"
+          move_id.operating_unit_id:
+            type: "m2o"
+            expected: "REC: ou_a"
+
+      - step: "Both journal items of the move carry operating unit A"
+        action: "search"
+        model: "account.move.line"
+        domain:
+          [
+            ["move_id", "=", "REC: donation.move_id.id"],
+            ["operating_unit_id", "=", "REC: ou_a.id"],
+          ]
+        save_as: "move_lines_ou_a"
+        expect_count: 2
+
+  - name:
+      "Donation with an empty operating unit posts a move with an empty operating unit
+      too"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Donation OU Analytic P2"
+
+      - step: "Create the fund the donation is received into"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Donation OU Fund P2"
+          code: "TDNOUP2"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create the income account"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Donation OU Income P2"
+          code: "TDNOUIN2"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Donation OU Receivable P2"
+          code: "TDNOURC2"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the cash account"
+        action: "create"
+        model: "account.account"
+        save_as: "cash_account"
+        values:
+          name: "Test Donation OU Cash P2"
+          code: "TDNOUCA2"
+          user_type_id: "REF: account.data_account_type_liquidity"
+
+      - step: "Create the journal the donation is posted through"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Donation OU Journal P2"
+          code: "TDNOUJ2"
+          type: "general"
+          default_account_id: "REC: cash_account.id"
+
+      - step: "Create the donation type"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Donation OU Type P2"
+          code: "TDNOUTY2"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+
+      - step: "Create the donor"
+        action: "create"
+        model: "res.partner"
+        save_as: "donor"
+        values:
+          name: "Test Donor OU P2"
+
+      - step: "Create the donation with no operating unit"
+        action: "create"
+        model: "donation"
+        save_as: "donation"
+        values:
+          partner_id: "REC: donor.id"
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          operating_unit_id: false
+          amount: 150000.0
+          receipt_method: "cash"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+
+      - step: "Confirm the donation"
+        action: "call"
+        target: "donation"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+
+      - step: "Approve the donation, which also runs Done"
+        action: "call"
+        target: "donation"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+
+      - step: "The move exists but carries no operating unit either"
+        action: "assert"
+        target: "donation"
+        asserts:
+          move_id:
+            type: "value"
+            operator: "is_truthy"
+          move_id.operating_unit_id:
+            type: "value"
+            operator: "is_falsy"
+
+      - step: "Neither journal item carries an operating unit"
+        action: "search"
+        model: "account.move.line"
+        domain:
+          [
+            ["move_id", "=", "REC: donation.move_id.id"],
+            ["operating_unit_id", "=", false],
+          ]
+        save_as: "move_lines_no_ou"
+        expect_count: 2
+
+  - name:
+      "Operating unit record rule scopes donation list visibility, and the company group
+      implies the operating unit group"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Donation OU Analytic P3"
+
+      - step: "Create the fund the donation is received into"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Donation OU Fund P3"
+          code: "TDNOUP3"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create the income account"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Donation OU Income P3"
+          code: "TDNOUIN3"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Donation OU Receivable P3"
+          code: "TDNOURC3"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the cash account"
+        action: "create"
+        model: "account.account"
+        save_as: "cash_account"
+        values:
+          name: "Test Donation OU Cash P3"
+          code: "TDNOUCA3"
+          user_type_id: "REF: account.data_account_type_liquidity"
+
+      - step: "Create the journal the donation is posted through"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Donation OU Journal P3"
+          code: "TDNOUJ3"
+          type: "general"
+          default_account_id: "REC: cash_account.id"
+
+      - step: "Create the donation type"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Donation OU Type P3"
+          code: "TDNOUTY3"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+
+      - step: "Create the donor"
+        action: "create"
+        model: "res.partner"
+        save_as: "donor"
+        values:
+          name: "Test Donor OU P3"
+
+      - step: "Create partner for operating unit A"
+        action: "create"
+        model: "res.partner"
+        save_as: "ou_a_partner"
+        values:
+          name: "Test Donation OU-A Rule Partner P3"
+
+      - step: "Create operating unit A"
+        action: "create"
+        model: "operating.unit"
+        save_as: "ou_a"
+        values:
+          name: "Test Donation OU-A Rule P3"
+          code: "TDNOUAR3"
+          partner_id: "REC: ou_a_partner.id"
+
+      - step: "Create partner for operating unit B"
+        action: "create"
+        model: "res.partner"
+        save_as: "ou_b_partner"
+        values:
+          name: "Test Donation OU-B Rule Partner P3"
+
+      - step: "Create operating unit B"
+        action: "create"
+        model: "operating.unit"
+        save_as: "ou_b"
+        values:
+          name: "Test Donation OU-B Rule P3"
+          code: "TDNOUBR3"
+          partner_id: "REC: ou_b_partner.id"
+
+      - step: "Create donation scoped to operating unit A"
+        action: "create"
+        model: "donation"
+        save_as: "donation_a"
+        values:
+          partner_id: "REC: donor.id"
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          operating_unit_id: "REC: ou_a.id"
+          amount: 10000.0
+          receipt_method: "cash"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+
+      - step: "Create donation scoped to operating unit B"
+        action: "create"
+        model: "donation"
+        save_as: "donation_b"
+        values:
+          partner_id: "REC: donor.id"
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          operating_unit_id: "REC: ou_b.id"
+          amount: 20000.0
+          receipt_method: "cash"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+
+      - step: "Create user allowed on operating unit A only"
+        action: "create"
+        model: "res.users"
+        save_as: "user_a"
+        values:
+          name: "Donation OU-A Rule User P3"
+          login: "donation_ou_a_rule_user_p3"
+          default_operating_unit_id: "REC: ou_a.id"
+          assigned_operating_unit_ids:
+            - - 6
+              - 0
+              - - "REC: ou_a.id"
+          groups_id:
+            - - 6
+              - 0
+              - - "REF: base.group_user"
+                - "REF: ssi_donation.donation_user_group"
+                - "REF: ssi_donation_operating_unit.donation_ou_group"
+
+      - step: "User of operating unit A can see the donation scoped to A"
+        action: "search"
+        model: "donation"
+        as_user: "user_a"
+        domain:
+          - ["id", "=", "REC: donation_a.id"]
+        save_as: "seen_by_a"
+        expect_count: 1
+
+      - step: "User of operating unit A cannot see the donation scoped to B"
+        action: "search"
+        model: "donation"
+        as_user: "user_a"
+        domain:
+          - ["id", "=", "REC: donation_b.id"]
+        save_as: "not_seen_by_a"
+        expect_count: 0
+
+      - step: "Create user with only the local donation company group"
+        action: "create"
+        model: "res.users"
+        save_as: "company_user"
+        values:
+          name: "Donation OU Company-Group User P3"
+          login: "donation_ou_company_group_user_p3"
+          groups_id:
+            - - 6
+              - 0
+              - - "REF: base.group_user"
+                - "REF: ssi_donation.donation_company_group"
+
+      - step: "User automatically obtains the operating unit group (implied)"
+        action: "assert"
+        target: "company_user"
+        asserts:
+          groups_id:
+            type: "m2m"
+            check: "contains_xml_ids"
+            expected_xml_ids:
+              - "ssi_donation_operating_unit.donation_ou_group"
+
+  - name: "Editing operating_unit_id through the form once Confirmed is rejected"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Donation OU Analytic P4"
+
+      - step: "Create the fund the donation is received into"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Donation OU Fund P4"
+          code: "TDNOUP4"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create the income account"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Donation OU Income P4"
+          code: "TDNOUIN4"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Donation OU Receivable P4"
+          code: "TDNOURC4"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the cash account"
+        action: "create"
+        model: "account.account"
+        save_as: "cash_account"
+        values:
+          name: "Test Donation OU Cash P4"
+          code: "TDNOUCA4"
+          user_type_id: "REF: account.data_account_type_liquidity"
+
+      - step: "Create the journal the donation is posted through"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Donation OU Journal P4"
+          code: "TDNOUJ4"
+          type: "general"
+          default_account_id: "REC: cash_account.id"
+
+      - step: "Create the donation type"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Donation OU Type P4"
+          code: "TDNOUTY4"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+
+      - step: "Create the donor"
+        action: "create"
+        model: "res.partner"
+        save_as: "donor"
+        values:
+          name: "Test Donor OU P4"
+
+      - step: "Create partner for operating unit A"
+        action: "create"
+        model: "res.partner"
+        save_as: "ou_a_partner"
+        values:
+          name: "Test Donation OU-A Readonly Partner P4"
+
+      - step: "Create operating unit A"
+        action: "create"
+        model: "operating.unit"
+        save_as: "ou_a"
+        values:
+          name: "Test Donation OU-A Readonly P4"
+          code: "TDNOUARO4"
+          partner_id: "REC: ou_a_partner.id"
+
+      - step: "Create partner for operating unit B"
+        action: "create"
+        model: "res.partner"
+        save_as: "ou_b_partner"
+        values:
+          name: "Test Donation OU-B Readonly Partner P4"
+
+      - step: "Create operating unit B"
+        action: "create"
+        model: "operating.unit"
+        save_as: "ou_b"
+        values:
+          name: "Test Donation OU-B Readonly P4"
+          code: "TDNOUBRO4"
+          partner_id: "REC: ou_b_partner.id"
+
+      - step: "Create the donation scoped to operating unit A"
+        action: "create"
+        model: "donation"
+        save_as: "donation"
+        values:
+          partner_id: "REC: donor.id"
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          operating_unit_id: "REC: ou_a.id"
+          amount: 5000.0
+          receipt_method: "cash"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+
+      - step: "Confirm the donation"
+        action: "call"
+        target: "donation"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+
+      - step: "Editing operating_unit_id through the form while Confirmed is rejected"
+        action: "form"
+        target: "donation"
+        save: false
+        expect_error:
+          type: "AssertionError"
+        values:
+          operating_unit_id: "REC: ou_b"
+
+  - name:
+      "A user restricted to one operating unit cannot write to a donation scoped to a
+      different operating unit"
+    steps:
+      - step: "Create the analytic account to bind the fund to"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Donation OU Analytic P5"
+
+      - step: "Create the fund the donation is received into"
+        action: "create"
+        model: "donation_fund"
+        save_as: "fund"
+        values:
+          name: "Test Donation OU Fund P5"
+          code: "TDNOUP5"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create the income account"
+        action: "create"
+        model: "account.account"
+        save_as: "income_account"
+        values:
+          name: "Test Donation OU Income P5"
+          code: "TDNOUIN5"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Create the receivable account"
+        action: "create"
+        model: "account.account"
+        save_as: "receivable_account"
+        values:
+          name: "Test Donation OU Receivable P5"
+          code: "TDNOURC5"
+          user_type_id: "REF: account.data_account_type_receivable"
+          reconcile: true
+
+      - step: "Create the cash account"
+        action: "create"
+        model: "account.account"
+        save_as: "cash_account"
+        values:
+          name: "Test Donation OU Cash P5"
+          code: "TDNOUCA5"
+          user_type_id: "REF: account.data_account_type_liquidity"
+
+      - step: "Create the journal the donation is posted through"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Donation OU Journal P5"
+          code: "TDNOUJ5"
+          type: "general"
+          default_account_id: "REC: cash_account.id"
+
+      - step: "Create the donation type"
+        action: "create"
+        model: "donation_type"
+        save_as: "type"
+        values:
+          name: "Test Donation OU Type P5"
+          code: "TDNOUTY5"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+          receivable_account_id: "REC: receivable_account.id"
+
+      - step: "Create the donor"
+        action: "create"
+        model: "res.partner"
+        save_as: "donor"
+        values:
+          name: "Test Donor OU P5"
+
+      - step: "Create partner for operating unit A"
+        action: "create"
+        model: "res.partner"
+        save_as: "ou_a_partner"
+        values:
+          name: "Test Donation OU-A Access Partner P5"
+
+      - step: "Create operating unit A"
+        action: "create"
+        model: "operating.unit"
+        save_as: "ou_a"
+        values:
+          name: "Test Donation OU-A Access P5"
+          code: "TDNOUAA5"
+          partner_id: "REC: ou_a_partner.id"
+
+      - step: "Create partner for operating unit B"
+        action: "create"
+        model: "res.partner"
+        save_as: "ou_b_partner"
+        values:
+          name: "Test Donation OU-B Access Partner P5"
+
+      - step: "Create operating unit B"
+        action: "create"
+        model: "operating.unit"
+        save_as: "ou_b"
+        values:
+          name: "Test Donation OU-B Access P5"
+          code: "TDNOUBA5"
+          partner_id: "REC: ou_b_partner.id"
+
+      - step: "Create the donation scoped to operating unit B, as admin"
+        action: "create"
+        model: "donation"
+        save_as: "donation_b"
+        as_user: "base.user_admin"
+        values:
+          partner_id: "REC: donor.id"
+          type_id: "REC: type.id"
+          fund_id: "REC: fund.id"
+          operating_unit_id: "REC: ou_b.id"
+          amount: 8000.0
+          receipt_method: "cash"
+          journal_id: "REC: journal.id"
+          income_account_id: "REC: income_account.id"
+
+      - step: "Create a user restricted to operating unit A only"
+        action: "create"
+        model: "res.users"
+        save_as: "user_a"
+        values:
+          name: "Donation OU-A Access User P5"
+          login: "donation_ou_a_access_user_p5"
+          default_operating_unit_id: "REC: ou_a.id"
+          assigned_operating_unit_ids:
+            - - 6
+              - 0
+              - - "REC: ou_a.id"
+          groups_id:
+            - - 6
+              - 0
+              - - "REF: base.group_user"
+                - "REF: ssi_donation.donation_user_group"
+                - "REF: ssi_donation_operating_unit.donation_ou_group"
+
+      - step: "That user is denied writing to the donation scoped to operating unit B"
+        action: "write"
+        target: "donation_b"
+        as_user: "user_a"
+        expect_error:
+          type: "AccessError"
+        values:
+          note: "Attempted edit from an unauthorized operating unit"
